@@ -4,9 +4,8 @@ require 'data_mapper'
 require 'json'
 require 'securerandom'
 
-# TODO learn credentials and endpoint info from the environment
-CHARGE_API_TOKEN = 'mySecretToken'
-CHARGE_ROOT = "http://api-token:#{CHARGE_API_TOKEN}@localhost:9112"
+CHARGE_API_TOKEN = ENV['CHARGE_API_TOKEN'] || 'mySecretToken'
+CHARGE_ROOT = ENV['CHARGE_ROOT'] || "http://api-token:#{CHARGE_API_TOKEN}@localhost:9112"
 MIN_PER_BYTE_BID = 1 # minimum price per byte in msatoshis
 KILO_BYTE = 2 ** 10
 MEGA_BYTE = 2 ** 20
@@ -14,7 +13,7 @@ MAX_MESSAGE_SIZE = 1 * MEGA_BYTE
 LN_INVOICE_EXPIRY = 60 * 10 # ten minutes
 LN_INVOICE_DESCRIPTION = "BSS Test" # "Blockstream Satellite Transmission"
 
-CALLBACK_URI_ROOT = "http://localhost:4567"
+CALLBACK_URI_ROOT = ENV['CALLBACK_URI_ROOT'] || "http://localhost:4567"
 
 require './helpers/init'
 require './models/init'
