@@ -71,7 +71,7 @@ post '/send' do
   }
   
   unless response.status == 201
-    halt 400, "Lightning Charge invoice failure"
+    halt 400, {:message => "Lightning Charge error", :errors => ["received #{response.status} from charged"]}.to_json
   end
 
   lightning_invoice = JSON.parse(response.body)
