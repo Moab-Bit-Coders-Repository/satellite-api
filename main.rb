@@ -20,6 +20,9 @@ require './helpers/init'
 require './models/init'
 
 configure do
+  set :raise_errors, false
+  set :show_exceptions, :after_handler
+  
   DataMapper::Logger.new($stdout, :debug)
   DataMapper.setup(:default, "sqlite:///#{Dir.pwd}/project.db")
   DataMapper.finalize
