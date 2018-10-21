@@ -12,6 +12,7 @@ KILO_BYTE = 2 ** 10
 MEGA_BYTE = 2 ** 20
 MAX_MESSAGE_SIZE = 1 * MEGA_BYTE
 LN_INVOICE_EXPIRY = 60 * 10 # ten minutes
+LN_INVOICE_DESCRIPTION = "BSS Test" # "Blockstream Satellite Transmission"
 
 CALLBACK_URI_ROOT = "http://localhost:4567"
 
@@ -60,7 +61,7 @@ post '/send' do
   # generate Lightning invoice
   response = $lightning_charge.post '/invoice', {
     msatoshi: Integer(params[:bid] * params[:message].size),
-    description: "Blockstream Satellite Transmission", 
+    description: LN_INVOICE_DESCRIPTION,
     expiry: LN_INVOICE_EXPIRY, 
     metadata: {id: order_id, msatoshis_per_byte: params[:bid], sha256_message_digest: message_digest.to_s},
     webhook: callback_url(order_id, auth_token)
