@@ -24,6 +24,7 @@ configure do
   set :show_exceptions, :after_handler
   
   DataMapper::Logger.new($stdout, :debug)
+  DataMapper::Model.raise_on_save_failure = true
   DataMapper.setup(:default, "sqlite:///#{Dir.pwd}/project.db")
   DataMapper.finalize
 
