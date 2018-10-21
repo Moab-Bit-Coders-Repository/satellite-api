@@ -77,15 +77,13 @@ post '/send' do
 
   lightning_invoice = JSON.parse(response.body)
 
-  # TODO write order to db
-  # create makes the resource immediately
   Order.create(
     :bid => params[:bid],
     :message => params[:message],
     :message_digest => message_digest,
     :status => :pending,
-    :order_id => order_id,
-    :lightning_invoice_id => lightning_invoice[:id],
+    :orderid => order_id,
+    :lightning_invoiceid => lightning_invoice["id"],
     :lightning_invoice => lightning_invoice.to_json,
     :created_at => Time.now
   )
