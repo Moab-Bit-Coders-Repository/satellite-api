@@ -2,7 +2,6 @@ require 'sinatra'
 require "faraday"
 require 'data_mapper'
 require 'dm-noisy-failures'
-require 'json'
 require 'securerandom'
 
 CHARGE_API_TOKEN = ENV['CHARGE_API_TOKEN'] || 'mySecretToken'
@@ -46,8 +45,8 @@ end
 # GET /queue
 # get snapshot of message queue
 get '/queue' do
-  # TODO remvove internal IDs before serving
-  Order.all.to_json
+  REVEALED_FIELDS = [:bid, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at]
+  Order.all(:fields => REVEALED_FIELDS, :status.not => [:sent, :cancelled]).to_json
 end
 
 # POST /send
@@ -92,13 +91,39 @@ post '/send' do
   lightning_invoice.to_json
 end
 
-delete 'cancel' do
-  # TODO
+delete 'cancel/:order_id/:auth_token' do
+  unless hash_hmac('sha256', LIGHTNING_HOOK_KEY, order_id) == auth_token
+    halt 400, {:message => "Invalid authentication token", :errors => ["Invalid authentication token in callback"]}.to_json
+  end
+  
+  unless order = Order.first(:orderid => order_id)
+    halt 400, {:message => "Invalid order id", :errors => ["Invalid order #{order_id}"]}.to_json
+  end
+
+  unless [:pending, :paid].include?(order.status)
+    halt 400, {:message => "Cannot cancel order", :errors => ["Order already #{order.status}"]}.to_json
+  end
+
+  order.update(:status => :cancelled)
+
+  {:message => "order cancelled"}.to_json
 end
 
-post 'callback/:order_id/:token' do
-  # TODO
-  # authenticate the request
-  # inspect updated invoice
-  # if all is good, mark the order as paid = true
+# invoice paid callback from charged
+post 'callback/:order_id/:auth_token' do
+  unless hash_hmac('sha256', LIGHTNING_HOOK_KEY, order_id) == auth_token
+    halt 400, {:message => "Invalid authentication token", :errors => ["Invalid authentication token in callback"]}.to_json
+  end
+  
+  unless order = Order.first(:orderid => order_id)
+    halt 400, {:message => "Invalid order id", :errors => ["Invalid order #{order_id}"]}.to_json
+  end
+
+  unless order.status == :pending
+    halt 400, {:message => "Payment problem", :errors => ["Order already #{order.status}"]}.to_json
+  end
+
+  order.update(:status => :paid)
+  
+  {:message => "order paid"}.to_json
 end
