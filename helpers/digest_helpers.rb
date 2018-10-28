@@ -1,5 +1,5 @@
 require 'sinatra/base'
-require 'OpenSSL'
+require 'openssl'
 
 def hash_hmac(digest, key, data)
   d = OpenSSL::Digest.new(digest)
