@@ -1,19 +1,26 @@
-FROM ruby:2.4
+FROM alpine:latest
 
-ADD Gemfile /app/
-ADD Gemfile.lock /app/
+ENV RUBY_PACKAGES ruby ruby-io-console ruby-irb ruby-rake ruby-bundler ruby-bigdecimal ruby-json
+ENV RUBY_DEPS libstdc++ tzdata bash ca-certificates openssl sqlite sqlite-dev
 
-# throw errors if Gemfile has been modified since Gemfile.lock
-RUN bundle config --global frozen 1
+RUN apk update && \
+    apk upgrade && \
+    apk --update add $RUBY_PACKAGES $RUBY_DEPS && \
+    echo 'gem: --no-document' > /etc/gemrc
 
-RUN gem install bundler --no-ri --no-rdoc && \
-    cd /app ; bundle install
+RUN mkdir /app
 
-ADD . /app
-RUN chown -R nobody:nogroup /app
-USER nobody
-ENV RACK_ENV production
-EXPOSE 4567
+COPY Gemfile /app
+COPY Gemfile.lock /app
 WORKDIR /app
 
-CMD ["ruby", "main.rb"]
+# install packages needed for building compiled gems; install gems; then delete build dependencies to keep Docker image small
+ENV BUILD_PACKAGES sudo build-base ruby-dev libc-dev linux-headers openssl-dev
+RUN apk --update add --virtual build_deps $BUILD_PACKAGES && \
+    bundle install && \
+    apk del build_deps && \
+    rm -rf /var/cache/apk/*
+
+COPY . /app
+EXPOSE 9282
+CMD ["bundle", "exec", "rackup"]
