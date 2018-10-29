@@ -23,4 +23,4 @@ RUN apk --update add --virtual build_deps $BUILD_PACKAGES && \
 
 COPY . /app
 EXPOSE 9282
-CMD ["bundle", "exec", "rackup"]
+CMD ["bundle", "exec", "rackup", "--host", "0.0.0.0"]
