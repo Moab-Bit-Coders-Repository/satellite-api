@@ -1,0 +1,126 @@
+bootcmd:
+  - blkid /dev/disk/by-id/google-data || mkfs.ext4 -L data /dev/disk/by-id/google-data
+mounts:
+  - [ /dev/disk/by-id/google-data, /mnt/disks/data, auto, "rw,noatime,discard,nobarrier,nodev" ]
+
+users:
+  - name: bs
+    uid: 2000
+
+write_files:
+  - path: /home/bs/bitcoin.conf
+    permissions: 0644
+    owner: root
+    content: |
+        rpcuser=${rpcuser}
+        rpcpassword=${rpcpass}
+        rpcport=${rpcport}
+        txindex=1
+        dbcache=4000
+        #debug=1
+        logips=1
+
+  - path: /home/bs/lightning.conf
+    permissions: 0644
+    owner: root
+    content: |
+        alias=btc-ionosphere
+        bitcoin-rpcuser=${rpcuser}
+        bitcoin-rpcpassword=${rpcpass}
+        bitcoin-rpcport=${rpcport}
+        log-level=debug
+        announce-addr=${announce_addr}
+        bind-addr=127.0.0.1:${lightning_port}
+
+  - path: /etc/systemd/system/bitcoin.service
+    permissions: 0644
+    owner: root
+    content: |
+        [Unit]
+        Description=Bitcoin node
+        Wants=gcr-online.target
+        After=gcr-online.service
+
+        [Service]
+        Restart=always
+        RestartSec=3
+        Environment=HOME=/home/bs
+        ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+        ExecStart=/usr/bin/docker run \
+            --network=host \
+            --pid=host \
+            --name=bitcoin \
+            --tmpfs /tmp/ \
+            -v /home/bs/bitcoin.conf:/root/.bitcoin/bitcoin.conf:ro \
+            -v /mnt/disks/data/bitcoin:/root/.bitcoin:rw \
+            "${bitcoin_docker}" ${bitcoin_cmd}
+        ExecStop=/usr/bin/docker exec bitcoin bitcoin-cli stop
+        ExecStop=/usr/bin/sleep 20
+        ExecStop=/usr/bin/docker stop bitcoin
+        ExecStopPost=/usr/bin/docker rm bitcoin
+
+  - path: /etc/systemd/system/lightning.service
+    permissions: 0644
+    owner: root
+    content: |
+        [Unit]
+        Description=Lightning node
+        Wants=gcr-online.target
+        After=bitcoin.service
+
+        [Service]
+        Restart=always
+        RestartSec=3
+        Environment=HOME=/home/bs
+        ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+        ExecStartPre=/sbin/iptables -A INPUT -m tcp -p tcp --dport ${lightning_port} -j ACCEPT
+        ExecStart=/usr/bin/docker run \
+            --network=host \
+            --pid=host \
+            --name=lightning \
+            --tmpfs /tmp/ \
+            -v /home/bs/lightning.conf:/root/.lightning/lightning.conf:ro \
+            -v /mnt/disks/data/lightning:/root/.lightning:rw \
+            "${lightning_docker}" ${lightning_cmd}
+        ExecStop=/usr/bin/docker exec lightning lightning-cli stop
+        ExecStop=/usr/bin/sleep 20
+        ExecStop=/usr/bin/docker stop lightning
+        ExecStopPost=/usr/bin/docker rm lightning
+        ExecStopPost=/sbin/iptables -D INPUT -m tcp -p tcp --dport ${lightning_port} -j ACCEPT
+
+  - path: /etc/systemd/system/charge.service
+    permissions: 0644
+    owner: root
+    content: |
+        [Unit]
+        Description=Charge instance
+        Wants=gcr-online.target
+        After=lightning.service
+
+        [Service]
+        Restart=always
+        RestartSec=200
+        Environment=HOME=/home/bs
+        ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+        ExecStartPre=/sbin/iptables -A INPUT -p tcp -s localhost --dport 9112 -j ACCEPT
+        ExecStart=/usr/bin/docker run \
+            --network=host \
+            --pid=host \
+            --name=charge \
+            --tmpfs /tmp/ \
+            -v /mnt/disks/data/lightning:/etc/lightning:ro \
+            -v /mnt/disks/data/charge:/data:rw \
+            -e "API_TOKEN=${rpcpass}" \
+            "${charge_docker}"
+        ExecStop=/usr/bin/docker stop charge
+        ExecStopPost=/usr/bin/docker rm charge
+        ExecStopPost=/sbin/iptables -D INPUT -p tcp -s localhost --dport 9112 -j ACCEPT
+
+runcmd:
+  - systemctl daemon-reload
+  - systemctl start bitcoin.service
+  - systemctl enable bitcoin.service
+  - systemctl start lightning.service
+  - systemctl enable lightning.service
+  - systemctl start charge.service
+  - systemctl enable charge.service
