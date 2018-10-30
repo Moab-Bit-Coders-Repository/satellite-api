@@ -99,4 +99,3 @@ In development mode (i.e. when the ```RACK_ENV``` environment variable is set to
 * Support bids priced in fiat currencies.
 * Report the top bid_per_byte, queue depth, and estimated time to transmit in the response to `POST /order`.
 * Rate limit the speed of the FIFO consumer to more accurately simulate the Blockstream Satellite message transmission rate.
-
