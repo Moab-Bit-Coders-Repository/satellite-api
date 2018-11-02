@@ -3,12 +3,16 @@ FROM alpine:latest
 ENV RUBY_PACKAGES ruby ruby-io-console ruby-irb ruby-rake ruby-bundler ruby-bigdecimal ruby-json
 ENV RUBY_DEPS libstdc++ tzdata bash ca-certificates openssl sqlite sqlite-dev
 
+RUN addgroup -g 1000 ionosphere \
+  && adduser -u 1000 -D -G ionosphere ionosphere
+
 RUN apk update && \
     apk upgrade && \
     apk --update add $RUBY_PACKAGES $RUBY_DEPS && \
     echo 'gem: --no-document' > /etc/gemrc
 
-RUN mkdir /app
+RUN mkdir /app && \
+    mkdir /data
 
 COPY Gemfile /app
 COPY Gemfile.lock /app
@@ -22,5 +26,8 @@ RUN apk --update add --virtual build_deps $BUILD_PACKAGES && \
     rm -rf /var/cache/apk/*
 
 COPY . /app
+RUN chown -R ionosphere:ionosphere /app
+
+USER ionosphere
 EXPOSE 9282
-CMD ["bundle", "exec", "rackup", "--host", "0.0.0.0"]
+CMD ./docker_entrypoint.sh
