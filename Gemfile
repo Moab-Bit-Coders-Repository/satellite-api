@@ -9,4 +9,5 @@ gem 'dm-sqlite-adapter'
 gem 'dm-noisy-failures'
 gem 'daemons'
 gem 'puma'
+gem 'rake'
 # gem "shrine", "~> 2.0" # secure file uploads (consider using for larger messages)
