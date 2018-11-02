@@ -15,17 +15,12 @@ LN_INVOICE_DESCRIPTION = "BSS Test" # "Blockstream Satellite Transmission"
 
 CALLBACK_URI_ROOT = ENV['CALLBACK_URI_ROOT'] || "http://localhost:4567"
 
-require './helpers/init'
-require './models/init'
+require_relative 'dm_config'
+require_relative './helpers/init'
 
 configure do
   set :raise_errors, false
   set :show_exceptions, :after_handler
-  
-  DataMapper::Logger.new($stdout, :debug)
-#  DataMapper::Model.raise_on_save_failure = true
-  DataMapper.setup(:default, "sqlite:///#{Dir.pwd}/project.db")
-  DataMapper.finalize
 
   LIGHTNING_HOOK_KEY = hash_hmac('sha256', 'lightning-hook-token', CHARGE_API_TOKEN)
   $lightning_charge = Faraday.new(:url => CHARGE_ROOT)  

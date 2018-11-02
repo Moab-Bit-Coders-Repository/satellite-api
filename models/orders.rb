@@ -1,5 +1,3 @@
-# TODO add validations
-
 class Order
   include DataMapper::Resource
 

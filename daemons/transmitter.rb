@@ -1,14 +1,11 @@
 require 'data_mapper'
 require 'json'
 
-require '../models/init'
+require_relative '../dm_config'
+require_relative '../helpers/init'
 
 FIFO_PIPE_PATH = "/tmp/src" # named pipe with GNU radio sitting on the other end
 SLEEP_TIME = 1
-
-DataMapper::Logger.new($stdout, :debug)
-DataMapper.setup(:default, "sqlite:///#{Dir.pwd}/project.db")
-DataMapper.finalize
 
 # loop forever dequing the highest-priced paid order and piping it to the GNU radio FIFO
 loop do
