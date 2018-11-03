@@ -41,7 +41,7 @@ end
 # get snapshot of message queue
 get '/queue' do
   REVEALED_FIELDS = [:bid, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at]
-  Order.all(:fields => REVEALED_FIELDS, :status.not => [:sent, :cancelled]).to_json
+  Order.all(:fields => REVEALED_FIELDS, :status.not => [:sent, :cancelled]).to_json(:only => REVEALED_FIELDS)
 end
 
 # POST /send
