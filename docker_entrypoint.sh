@@ -11,7 +11,7 @@ trap cleanup_before_exit SIGTERM
 mkdir -p /data/ionosphere
 bundle exec rake migrate
 
-bundle exec ruby daemons/transmitter_control start
+bundle exec ruby daemons/transmitter_control.rb start
 bundle exec rackup --host 0.0.0.0
 
 
