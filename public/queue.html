@@ -38,22 +38,49 @@
 
 <body id="home">
   
-  <div class="panel panel-default">
-    <div class="panel-heading">Queued Messages</div>
-
-    <table id="table">
-        <thead>
-            <tr>              
-                <th class="created_at">Created</th>
-                <th class="bid">Bid (msatoshis)</th>
-                <th class="message">Message</th>
-                <th class="message_digest">Message Digest</th>
-                <th class="status">Status</th>
-                <th class="upload_started_at">Upload Started</th>
-                <th class="upload_ended_at">Upload Ended</th>
-            </tr>
-        </thead>
-    </table>
+  <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item active">
+      <a class="nav-link" id="pills-queued-tab" data-toggle="pill" href="#pills-queued" role="tab" aria-controls="pills-queued" aria-selected="true">Queued</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="pills-sent-tab" data-toggle="pill" href="#pills-sent" role="tab" aria-controls="pills-sent" aria-selected="false">Sent</a>
+    </li>
+  </ul>
+  <div class="tab-content" id="pills-tabContent">
+    <div class="tab-pane fade active in" id="pills-queued" role="tabpanel" aria-labelledby="pills-queued-tab">
+      <div class="panel panel-default">
+        <table id="queued_table">
+            <thead>
+                <tr>
+                    <th class="created_at">Created</th>
+                    <th class="bid">Bid (msatoshis)</th>
+                    <th class="message">Message</th>
+                    <th class="message_digest">Message Digest</th>
+                    <th class="status">Status</th>
+                    <th class="upload_started_at">Upload Started</th>
+                    <th class="upload_ended_at">Upload Ended</th>
+                </tr>
+            </thead>
+        </table>
+      </div>
+    </div>
+    <div class="tab-pane fade active" id="pills-sent" role="tabpanel" aria-labelledby="pills-sent-tab">
+      <div class="panel panel-default">
+        <table id="sent_table">
+            <thead>
+                <tr>
+                    <th class="created_at">Created</th>
+                    <th class="bid">Bid (msatoshis)</th>
+                    <th class="message">Message</th>
+                    <th class="message_digest">Message Digest</th>
+                    <th class="status">Status</th>
+                    <th class="upload_started_at">Upload Started</th>
+                    <th class="upload_ended_at">Upload Ended</th>
+                </tr>
+            </thead>
+        </table>
+      </div>
+    </div>
   </div>
 
   <script type="text/javascript">
@@ -62,7 +89,7 @@
         $.each( data, function( key, val ) {
           var upload_started_at = moment(val.upload_started_at);
           var upload_ended_at = moment(val.upload_ended_at);
-          $("#table").append($('<tr>').append(
+          $("#queued_table").append($('<tr>').append(
                 $('<td>').text(moment(val.created_at).fromNow()),
                 $('<td>').text(val.bid),
                 $('<td>').text(val.message),
@@ -73,6 +100,23 @@
           ));
         });
       });
+
+      $.getJSON( "sent_messages", function( data ) {
+        $.each( data, function( key, val ) {
+          var upload_started_at = moment(val.upload_started_at);
+          var upload_ended_at = moment(val.upload_ended_at);
+          $("#sent_messages").append($('<tr>').append(
+                $('<td>').text(moment(val.created_at).fromNow()),
+                $('<td>').text(val.bid),
+                $('<td>').html('<a href="messages/' + val.message_digest + '">download</a>'),
+                $('<td>').text(val.message_digest),
+                $('<td>').text(val.status),
+                $('<td>').text(upload_started_at.isValid() ? upload_started_at.fromNow() : ""),
+                $('<td>').text(upload_ended_at.isValid() ? upload_ended_at.fromNow() : "")
+          ));
+        });
+      });
+
     });
   </script>    
 
