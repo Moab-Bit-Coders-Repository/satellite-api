@@ -40,15 +40,15 @@ end
 # GET /queue
 # get snapshot of message queue
 get '/queue' do
-  orders = Order.all(:fields => Order::PUBLIC_FIELDS, 
-                     :status.not => [:sent, :cancelled],
-                     :order => [:created_at.desc]).to_json(:only => Order::PUBLIC_FIELDS)
+  Order.all(:fields => Order::PUBLIC_FIELDS, 
+            :status.not => [:sent, :cancelled],
+            :order => [:created_at.desc]).to_json(:only => Order::PUBLIC_FIELDS)
 end
 
 get '/sent_messages' do
-  orders = Order.all(:fields => Order::PUBLIC_FIELDS, 
-                     :status => :sent,
-                     :order => [:created_at.desc]).to_json(:only => Order::PUBLIC_FIELDS)
+  Order.all(:fields => Order::PUBLIC_FIELDS, 
+            :status => :sent,
+            :order => [:created_at.desc]).to_json(:only => Order::PUBLIC_FIELDS)
 end
 
 # POST /send
