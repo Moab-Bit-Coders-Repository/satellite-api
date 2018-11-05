@@ -45,6 +45,12 @@ get '/queue' do
                      :order => [:created_at.desc]).to_json(:only => Order::PUBLIC_FIELDS)
 end
 
+get '/sent_messages' do
+  orders = Order.all(:fields => Order::PUBLIC_FIELDS, 
+                     :status => :sent,
+                     :order => [:created_at.desc]).to_json(:only => Order::PUBLIC_FIELDS)
+end
+
 # POST /send
 #  
 # send a message, along with a bid
@@ -87,12 +93,12 @@ post '/send' do
   lightning_invoice.to_json
 end
 
-delete 'cancel/:order_id/:auth_token' do
-  unless hash_hmac('sha256', LIGHTNING_HOOK_KEY, order_id) == auth_token
+delete '/cancel/:order_id/:auth_token' do
+  unless hash_hmac('sha256', LIGHTNING_HOOK_KEY, params[:order_id]) == params[:auth_token]
     halt 400, {:message => "Invalid authentication token", :errors => ["Invalid authentication token in callback"]}.to_json
   end
   
-  unless order = Order.first(:orderid => order_id)
+  unless order = Order.first(:orderid => params[:order_id])
     halt 400, {:message => "Invalid order id", :errors => ["Invalid order #{order_id}"]}.to_json
   end
 
@@ -106,12 +112,12 @@ delete 'cancel/:order_id/:auth_token' do
 end
 
 # invoice paid callback from charged
-post 'callback/:order_id/:auth_token' do
-  unless hash_hmac('sha256', LIGHTNING_HOOK_KEY, order_id) == auth_token
+post '/callback/:order_id/:auth_token' do
+  unless hash_hmac('sha256', LIGHTNING_HOOK_KEY, params[:order_id]) == params[:auth_token]
     halt 400, {:message => "Invalid authentication token", :errors => ["Invalid authentication token in callback"]}.to_json
   end
   
-  unless order = Order.first(:orderid => order_id)
+  unless order = Order.first(:orderid => params[:order_id])
     halt 400, {:message => "Invalid order id", :errors => ["Invalid order #{order_id}"]}.to_json
   end
 
