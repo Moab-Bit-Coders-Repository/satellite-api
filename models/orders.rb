@@ -1,5 +1,6 @@
 class Order
   include DataMapper::Resource
+  PUBLIC_FIELDS = [:bid, :message, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at]
 
   property :id,                     Serial
   property :bid,                    Integer, :key => true # msatoshis_per_byte

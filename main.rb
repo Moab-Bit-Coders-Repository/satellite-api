@@ -40,8 +40,9 @@ end
 # GET /queue
 # get snapshot of message queue
 get '/queue' do
-  REVEALED_FIELDS = [:bid, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at]
-  Order.all(:fields => REVEALED_FIELDS, :status.not => [:sent, :cancelled]).to_json(:only => REVEALED_FIELDS)
+  orders = Order.all(:fields => Order::PUBLIC_FIELDS, 
+                     :status.not => [:sent, :cancelled],
+                     :order => [:created_at.desc]).to_json(:only => Order::PUBLIC_FIELDS)
 end
 
 # POST /send
