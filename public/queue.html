@@ -105,7 +105,7 @@
         $.each( data, function( key, val ) {
           var upload_started_at = moment(val.upload_started_at);
           var upload_ended_at = moment(val.upload_ended_at);
-          $("#sent_messages").append($('<tr>').append(
+          $("#sent_table").append($('<tr>').append(
                 $('<td>').text(moment(val.created_at).fromNow()),
                 $('<td>').text(val.bid),
                 $('<td>').html('<a href="messages/' + val.message_digest + '">download</a>'),
