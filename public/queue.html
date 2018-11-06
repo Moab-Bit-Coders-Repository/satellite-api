@@ -108,7 +108,7 @@
           $("#sent_table").append($('<tr>').append(
                 $('<td>').text(moment(val.created_at).fromNow()),
                 $('<td>').text(val.bid),
-                $('<td>').html('<a href="messages/' + val.message_digest + '">download</a>'),
+                $('<td>').html('<a href="message/' + val.message_digest + '">download</a>'),
                 $('<td>').text(val.message_digest),
                 $('<td>').text(val.status),
                 $('<td>').text(upload_started_at.isValid() ? upload_started_at.fromNow() : ""),
