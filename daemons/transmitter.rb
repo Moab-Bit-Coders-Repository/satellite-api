@@ -3,8 +3,8 @@ require 'json'
 
 require_relative '../dm_config'
 require_relative '../helpers/init'
+require_relative '../fifo_config'
 
-FIFO_PIPE_PATH = "/tmp/src" # named pipe with GNU radio sitting on the other end
 SLEEP_TIME = 1
 
 # loop forever dequing the highest-priced paid order and piping it to the GNU radio FIFO
