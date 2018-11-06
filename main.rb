@@ -51,6 +51,10 @@ get '/sent_messages' do
             :order => [:created_at.desc]).to_json(:only => Order::PUBLIC_FIELDS)
 end
 
+get '/message/:message_hash' do
+  send_file File.join(MESSAGE_STORE_PATH, params[:message_hash])
+end
+
 # POST /send
 #  
 # send a message, along with a bid
