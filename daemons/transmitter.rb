@@ -2,7 +2,6 @@ require 'data_mapper'
 require 'json'
 
 require_relative '../dm_config'
-require_relative '../helpers/init'
 require_relative '../fifo_config'
 
 SLEEP_TIME = 1
