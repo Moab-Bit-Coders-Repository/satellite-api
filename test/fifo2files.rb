@@ -1,3 +1,4 @@
+require_relative '../constants'
 require_relative '../helpers/init'
 require_relative '../fifo_config'
 
