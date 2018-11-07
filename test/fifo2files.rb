@@ -2,7 +2,8 @@ require_relative '../constants'
 require_relative '../helpers/init'
 require_relative '../fifo_config'
 
-MESSAGE_STORE_PATH = ENV['MESSAGE_STORE_PATH'] || '/data/ionosphere/messages'
+RECEIVED_MESSAGE_STORE_PATH = File.join(MESSAGE_STORE_PATH, 'received')
+Dir.mkdir(RECEIVED_MESSAGE_STORE_PATH) unless File.exists?(RECEIVED_MESSAGE_STORE_PATH)
 
 loop do
   pipe = File.open(FIFO_PIPE_PATH, "rb")
@@ -11,7 +12,7 @@ loop do
   contents = pipe.read
 
   message_digest = sha256_digest(contents)
-  fn = "#{MESSAGE_STORE_PATH}/#{message_digest}"
+  fn = "#{RECEIVED_MESSAGE_STORE_PATH}/#{message_digest}"
   f = File.new(fn, "w")
 
   f.write(contents)
