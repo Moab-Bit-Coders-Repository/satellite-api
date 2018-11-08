@@ -12,13 +12,18 @@ loop do
   if sendable_order
     # TODO handle IOErrors exceptions
     sendable_order.status = :transmitting
+    sendable_order.upload_started_at = Time.now
     sendable_order.save
+    
+    # TODO fix status updates and uploaded_at timestamps
     File.open(sendable_order.message_path, "rb") do |message_file|
       File.open(FIFO_PIPE_PATH, "wb") do |pipe|
         IO.copy_stream(message_file, pipe, sendable_order.message_size)
       end
     end
+    
     sendable_order.status = :sent
+    sendable_order.upload_ended_at = Time.now
     sendable_order.save
   end
   
