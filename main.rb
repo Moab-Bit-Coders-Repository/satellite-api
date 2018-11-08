@@ -119,7 +119,7 @@ post '/order' do
   {:auth_token => auth_token, :lightning_invoice => lightning_invoice}.to_json
 end
 
-delete '/cancel/:uuid/:auth_token' do
+delete '/order/:uuid/:auth_token' do
   unless hash_hmac('sha256', LIGHTNING_HOOK_KEY, params[:uuid]) == params[:auth_token]
     halt 400, {:message => "Invalid authentication token", :errors => ["Invalid authentication token in callback"]}.to_json
   end
