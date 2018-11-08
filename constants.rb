@@ -4,7 +4,7 @@ SENT_MESSAGE_STORE_PATH = File.join(MESSAGE_STORE_PATH, 'sent')
 
 CHARGE_API_TOKEN = ENV['CHARGE_API_TOKEN'] || 'mySecretToken'
 CHARGE_ROOT = ENV['CHARGE_ROOT'] || "http://api-token:#{CHARGE_API_TOKEN}@localhost:9112"
-MIN_PER_BYTE_BID = 1 # minimum price per byte in msatoshis
+MIN_PER_BYTE_BID = (ENV['RACK_ENV'] == 'production') ? 100 : 1 # minimum price per byte in millisatoshis
 KILO_BYTE = 2 ** 10
 MEGA_BYTE = 2 ** 20
 MAX_MESSAGE_SIZE = 1 * MEGA_BYTE

@@ -53,7 +53,7 @@
             <thead>
                 <tr>
                     <th class="created_at">Created</th>
-                    <th class="bid">Bid (msatoshis)</th>
+                    <th class="bid_per_byte">Bid per Byte (millisatoshis)</th>
                     <th class="message_size">Message Size</th>
                     <th class="message_digest">Message Digest</th>
                     <th class="status">Status</th>
@@ -70,7 +70,7 @@
             <thead>
                 <tr>
                     <th class="created_at">Created</th>
-                    <th class="bid">Bid (msatoshis)</th>
+                    <th class="bid_per_byte">Bid per Byte (millisatoshis)</th>
                     <th class="message">Message</th>
                     <th class="message_size">Message Size</th>
                     <th class="message_digest">Message Digest</th>
@@ -92,7 +92,7 @@
           var upload_ended_at = moment(val.upload_ended_at);
           $("#queued_table").append($('<tr>').append(
                 $('<td>').text(moment(val.created_at).fromNow()),
-                $('<td>').text(val.bid),
+                $('<td>').text(val.bid_per_byte),
                 $('<td>').text(val.message_size),
                 $('<td>').text(val.message_digest),
                 $('<td>').text(val.status),
@@ -108,7 +108,7 @@
           var upload_ended_at = moment(val.upload_ended_at);
           $("#sent_table").append($('<tr>').append(
                 $('<td>').text(moment(val.created_at).fromNow()),
-                $('<td>').text(val.bid),
+                $('<td>').text(val.bid_per_byte),
                 $('<td>').html('<a href="message/' + val.message_digest + '">download</a>'),
                 $('<td>').text(val.message_size),
                 $('<td>').text(val.message_digest),

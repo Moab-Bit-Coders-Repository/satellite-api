@@ -26,7 +26,7 @@ end
 get '/queue' do
   Order.all(:fields => Order::PUBLIC_FIELDS, 
             :status.not => [:sent, :cancelled],
-            :order => [:created_at.desc]).to_json(:only => Order::PUBLIC_FIELDS)
+            :order => [:bid_per_byte.desc]).to_json(:only => Order::PUBLIC_FIELDS)
 end
 
 configure :development do
@@ -50,7 +50,7 @@ end
 
 # POST /order
 #  
-# send a message, along with a bid
+# upload a message, along with a bid (in millisatoshis)
 # return JSON object with status, uuid, and lightning payment invoice
 post '/order' do
   param :bid, Float, required: true, min: MIN_PER_BYTE_BID
@@ -81,12 +81,18 @@ post '/order' do
   message_file.close()
 
   order.message_size = message_size
+  
   order.message_digest = sha256.to_s
+  order.bid_per_byte = order.bid.to_f / order.message_size.to_f
+  if order.bid_per_byte < MIN_PER_BYTE_BID
+    halt 413, {:message => "Bid too low", :errors => ["Per byte bid cannot be below #{MIN_PER_BYTE_BID} millisatoshis per byte. The minimum bid for this message is #{order.message_size * MIN_PER_BYTE_BID} millisatoshis." ]}.to_json
+  end
+  
   auth_token = hash_hmac('sha256', LIGHTNING_HOOK_KEY, order.uuid)
   
   # generate Lightning invoice
   charged_response = $lightning_charge.post '/invoice', {
-    msatoshi: Integer(order.bid * order.message_size),
+    msatoshi: Integer(order.bid),
     description: LN_INVOICE_DESCRIPTION,
     expiry: LN_INVOICE_EXPIRY, 
     metadata: {uuid: order.uuid, msatoshis_per_byte: order.bid, sha256_message_digest: order.message_digest},

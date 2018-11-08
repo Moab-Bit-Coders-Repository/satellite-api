@@ -2,15 +2,16 @@ require_relative '../constants'
 
 class Order
   include DataMapper::Resource
-  PUBLIC_FIELDS = [:bid, :message_size, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at]
+  PUBLIC_FIELDS = [:bid, :bid_per_byte, :message_size, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at]
   
   def message_path
     File.join(MESSAGE_STORE_PATH, self.uuid)
   end
   
   property :id,                     Serial
-  property :bid,                    Integer, :key => true # msatoshis_per_byte
+  property :bid,                    Integer # millisatoshis
   property :message_size,           Integer
+  property :bid_per_byte,           Float, :key => true # millisatoshis per byte
   property :message_digest,         String, :length => 64
   property :status,                 Enum[:pending, :paid, :transmitting, :sent, :cancelled]
   property :uuid,                   String, :key => true

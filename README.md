@@ -32,13 +32,13 @@ The code samples below assume that you've set `IONOSPHERE` to the public base UR
 
 ### POST /order ###
 
-To place an order to transmit the file `hello_world.png` with an initial bid of 100 msatoshis per byte, issue an HTTP POST request like this:
+To place an order to transmit the file `hello_world.png` with an initial bid of 10,000 millisatoshi, issue an HTTP POST request like this:
 
 ```bash
-curl -F "bid=100" -F "file=@/path/to/upload/file/hello_world.png" $IONOSPHERE/order
+curl -F "bid=10000" -F "file=@/path/to/upload/file/hello_world.png" $IONOSPHERE/order
 ```
 
-If successful, the response includes the JSON Lightning invoice as returned by Lightning Charge's [POST /invoice](https://github.com/ElementsProject/lightning-charge#post-invoice) and an authentication token that can be used to modify the order. Within the metadata of the Lightning invoice, metadata is included providing: the bid (in msatoshis per byte), the SHA256 digest of the uploaded message file, and a UUID for the order.
+If successful, the response includes the JSON Lightning invoice as returned by Lightning Charge's [POST /invoice](https://github.com/ElementsProject/lightning-charge#post-invoice) and an authentication token that can be used to modify the order. Within the metadata of the Lightning invoice, metadata is included providing: the bid (in millisatoshis), the SHA256 digest of the uploaded message file, and a UUID for the order.
 
 ```bash
 {"auth_token":"d784e322dad7ec2671086ce3ad94e05108f2501180d8228577fbec4115774750","lightning_invoice":{"id":"N0LOTYc9j0gWtQVjVW7pK","msatoshi":"514200","description":"BSS Test","rhash":"5e5c9d111bc76ce4bf9b211f12ca2d9b66b81ae9839b4e530b16cedbef653a3a","payreq":"lntb5142n1pd78922pp5tewf6ygmcakwf0umyy039j3dndntsxhfswd5u5ctzm8dhmm98gaqdqdgff4xgz5v4ehgxqzjccqp286gfgrcpvzl04sdg2f9sany7ptc5aracnd6kvr2nr0e0x5ajpmfhsjkqzw679ytqgnt6w4490jjrgcvuemz790salqyz9far68cpqtgq3q23el","expires_at":1541642146,"created_at":1541641546,"metadata":{"msatoshis_per_byte":"200","sha256_message_digest":"0e2bddf3bba1893b5eef660295ef12d6fc72870da539c328cf24e9e6dbb00f00","uuid":"409348bc-6af0-4999-b715-4136753979df"},"status":"unpaid"}}
