@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'sinatra/param'
 require "faraday"
 require 'data_mapper'
 require 'dm-noisy-failures'
