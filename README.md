@@ -66,8 +66,13 @@ The response is a JSON array of records (one for each queued message). The revea
 
 ### queue.html ###
 
-In development mode (i.e. when the ```RACK_ENV``` environment variable is set to ```development```), a FIFO consumer daemon is run that simulates the GNU Radio hardware and a debugging webpage is exposed at `$IONOSPHERE/queue.html` that supports inspection of queued and sent message orders. This webpage also serves as a demonstration of how the JSON returned by `GET /queue` can be processed by JQuery for display in an HTML table.
+In development mode (i.e. when the ```RACK_ENV``` environment variable is set to ```development```), a FIFO consumer daemon is run that simulates the GNU Radio hardware and a debugging webpage is exposed at `$IONOSPHERE/queue.html` that supports inspection of queued and sent message orders. This webpage also serves as a demonstration of how the JSON returned by `GET /queue` can be processed by jQuery for display in an HTML table.
 
 ## Future Work ##
 
-An additional call (`POST /increase_bid`) will be added to the API to allow the bid to be increased for a message stuck in the queue.
+* An additional call (`POST /increase_bid`) will be added to the API to allow the bid to be increased for a message stuck in the queue.
+* Configure `Rack::Attack` to block and throttle abusive requests.
+* Support bids priced in fiat currencies.
+* Report the top bid_per_byte, queue depth, and estimated time to transmit in the response to `POST /order`.
+* Rate limit the speed of the FIFO consumer to more accurately simulate the Blockstream Satellite message transmission rate.
+
