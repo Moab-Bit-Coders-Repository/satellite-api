@@ -54,7 +54,7 @@
                 <tr>
                     <th class="created_at">Created</th>
                     <th class="bid">Bid (msatoshis)</th>
-                    <th class="message">Message</th>
+                    <th class="message_size">Message Size</th>
                     <th class="message_digest">Message Digest</th>
                     <th class="status">Status</th>
                     <th class="upload_started_at">Upload Started</th>
@@ -72,6 +72,7 @@
                     <th class="created_at">Created</th>
                     <th class="bid">Bid (msatoshis)</th>
                     <th class="message">Message</th>
+                    <th class="message_size">Message Size</th>
                     <th class="message_digest">Message Digest</th>
                     <th class="status">Status</th>
                     <th class="upload_started_at">Upload Started</th>
@@ -92,7 +93,7 @@
           $("#queued_table").append($('<tr>').append(
                 $('<td>').text(moment(val.created_at).fromNow()),
                 $('<td>').text(val.bid),
-                $('<td>').text(val.message),
+                $('<td>').text(val.message_size),
                 $('<td>').text(val.message_digest),
                 $('<td>').text(val.status),
                 $('<td>').text(upload_started_at.isValid() ? upload_started_at.fromNow() : ""),
@@ -109,6 +110,7 @@
                 $('<td>').text(moment(val.created_at).fromNow()),
                 $('<td>').text(val.bid),
                 $('<td>').html('<a href="message/' + val.message_digest + '">download</a>'),
+                $('<td>').text(val.message_size),
                 $('<td>').text(val.message_digest),
                 $('<td>').text(val.status),
                 $('<td>').text(upload_started_at.isValid() ? upload_started_at.fromNow() : ""),

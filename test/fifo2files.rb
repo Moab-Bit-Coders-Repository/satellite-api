@@ -1,22 +1,27 @@
+require 'tempfile'
+require 'fileutils'
+require 'openssl'
+
 require_relative '../constants'
 require_relative '../helpers/init'
 require_relative '../fifo_config'
 
-RECEIVED_MESSAGE_STORE_PATH = File.join(MESSAGE_STORE_PATH, 'received')
-Dir.mkdir(RECEIVED_MESSAGE_STORE_PATH) unless File.exists?(RECEIVED_MESSAGE_STORE_PATH)
+Dir.mkdir(SENT_MESSAGE_STORE_PATH) unless File.exists?(SENT_MESSAGE_STORE_PATH)
 
 loop do
   pipe = File.open(FIFO_PIPE_PATH, "rb")
+  tmpfile = File.open(Tempfile.new, 'wb')
 
-  # FIXME buffer the IO, don't just slurp the whole file into memory
-  contents = pipe.read
+  sha256 = OpenSSL::Digest::SHA256.new
+  while block = pipe.read(65536)
+    sha256 << block
+    tmpfile.write(block)
+    STDERR.puts "read block"
+  end
+  pipe.close()
+  tmpfile.close()
 
-  message_digest = sha256_digest(contents)
-  fn = "#{RECEIVED_MESSAGE_STORE_PATH}/#{message_digest}"
-  f = File.new(fn, "w")
-
-  f.write(contents)
-  puts "wrote #{contents.length} bytes to #{fn}"
-
-  f.close
+  FileUtils.mv(tmpfile.path, "#{SENT_MESSAGE_STORE_PATH}/#{sha256.to_s}")
+  STDERR.puts "moved file"
+  
 end

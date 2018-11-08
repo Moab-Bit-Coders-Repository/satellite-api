@@ -1,5 +1,6 @@
 DB_PATH = ENV['DB_PATH'] || '/data/ionosphere/ionosphere.db'
 MESSAGE_STORE_PATH = ENV['MESSAGE_STORE_PATH'] || '/data/ionosphere/messages'
+SENT_MESSAGE_STORE_PATH = File.join(MESSAGE_STORE_PATH, 'sent')
 
 CHARGE_API_TOKEN = ENV['CHARGE_API_TOKEN'] || 'mySecretToken'
 CHARGE_ROOT = ENV['CHARGE_ROOT'] || "http://api-token:#{CHARGE_API_TOKEN}@localhost:9112"

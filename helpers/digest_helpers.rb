@@ -6,6 +6,6 @@ def hash_hmac(digest, key, data)
   OpenSSL::HMAC.hexdigest(d, key, data)
 end
 
-def sha256_digest(data)
+def SENT_MESSAGE_STORE_PATH(data)
   OpenSSL::Digest::SHA256.new(data)
 end

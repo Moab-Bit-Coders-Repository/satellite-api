@@ -10,10 +10,14 @@ SLEEP_TIME = 1
 loop do
   sendable_order = Order.first(:status => :paid, :order => [:bid.desc])
   if sendable_order
-    # TODO handle IOErrors
+    # TODO handle IOErrors exceptions
     sendable_order.status = :transmitting
     sendable_order.save
-    IO.write(FIFO_PIPE_PATH, sendable_order.message)
+    File.open(sendable_order.message_path, "rb") do |message_file|
+      File.open(FIFO_PIPE_PATH, "wb") do |pipe|
+        IO.copy_stream(message_file, pipe, sendable_order.message_size)
+      end
+    end
     sendable_order.status = :sent
     sendable_order.save
   end
