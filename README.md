@@ -2,6 +2,8 @@
 
 c-lightning based Lapp that presents an API to submit messages for global broadcast over Blockstream Satellite and pay for them with Bitcoin Lightning payments.
 
+A brief screencast demonstration is available [here](https://drive.google.com/file/d/1W-wjVwT0sGOS28dnfRrgG1S4DE5Xbnl_/view?usp=sharing).
+
 # Setup
 
 Ionosphere is dependent on [lightning-charge](https://github.com/ElementsProject/lightning-charge), which itself is dependent on [c-lightning](https://github.com/ElementsProject/lightning) and [bitcoin](https://github.com/bitcoin/bitcoin). To bring up charged, lightningd, and bitcoind, a [handy docker-compose](https://github.com/DeviaVir/blc-docker) script is available.
