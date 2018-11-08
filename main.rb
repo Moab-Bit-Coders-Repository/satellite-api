@@ -58,11 +58,9 @@ end
 # return JSON object with status, uuid, and lightning payment invoice
 post '/order' do
   param :bid, Integer, required: true, min: MIN_PER_BYTE_BID
+  param :file, Hash, required: true
 
   # process the upload
-  unless params[:file]
-    halt 400, {:message => "Message upload problem", :errors => ["No file selected"]}.to_json
-  end
   unless tmpfile = params[:file][:tempfile]
     halt 400, {:message => "Message upload problem", :errors => ["No tempfile received"]}.to_json
   end
