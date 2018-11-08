@@ -54,12 +54,17 @@ To cancel an order, issue an HTTP DELETE request to the API endpoint `/cancel/:u
 curl -X DELETE $IONOSPHERE/cancel/409348bc-6af0-4999-b715-4136753979df/d784e322dad7ec2671086ce3ad94e05108f2501180d8228577fbec4115774750
 ```
 
-### GET /queue  ###
+### GET /orders  ###
 
-To retrieve a snapshot of the message queue, issue an HTTP GET to the API endpoint `/queue` like this:
+Retrieve a list of paid, but unsent orders. In development mode, a broader set of orders can be retrieved using the query parameter `status` to provide a filter in the form of a comma-separated list of order statuses. The valid order statuses are: `pending`, `paid`, `transmitting`, `sent`, and `cancelled`.
 
 ```bash
 curl $IONOSPHERE/queue
+```
+
+```bash
+export RACK_ENV=development
+curl $IONOSPHERE/queue?status=pending,transmitting,cancelled
 ```
 
 The response is a JSON array of records (one for each queued message). The revealed fields for each record include: `bid`, `message_size`, `message_digest`, `status`, `created_at`, `upload_started_at`, and `upload_ended_at`.

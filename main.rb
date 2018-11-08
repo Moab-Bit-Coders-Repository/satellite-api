@@ -21,21 +21,7 @@ before do
   content_type :json
 end
 
-# GET /queue
-# get snapshot of message queue
-get '/queue' do
-  Order.all(:fields => Order::PUBLIC_FIELDS, 
-            :status.not => [:sent, :cancelled],
-            :order => [:bid_per_byte.desc]).to_json(:only => Order::PUBLIC_FIELDS)
-end
-
 configure :development do
-  get '/sent_messages' do
-    Order.all(:fields => Order::PUBLIC_FIELDS, 
-              :status => :sent,
-              :order => [:created_at.desc]).to_json(:only => Order::PUBLIC_FIELDS)
-  end
-
   get '/message/:message_hash' do
     send_file File.join(SENT_MESSAGE_STORE_PATH, params[:message_hash]), :disposition => 'attachment'
   end
@@ -46,6 +32,23 @@ configure :development do
     response.body
   end
 
+end
+
+# GET /orders
+# params: 
+#   status - a comma-separated list of order statuses to return
+# If not in development mode, only paid, but unsent orders are returned
+get '/orders' do
+  param :status, String, required: false, default: "paid"
+  
+  if settings.environment == :development
+    statuses = (params[:status].split(',').map(&:to_sym) & Order::VALID_STATUSES)
+  else
+    statuses = [:paid] 
+  end
+  Order.all(:fields => Order::PUBLIC_FIELDS, 
+            :status => statuses,
+            :order => [:bid_per_byte.desc]).to_json(:only => Order::PUBLIC_FIELDS)
 end
 
 # POST /order

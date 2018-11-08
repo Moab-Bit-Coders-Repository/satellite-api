@@ -3,6 +3,9 @@ require_relative '../constants'
 class Order
   include DataMapper::Resource
   PUBLIC_FIELDS = [:bid, :bid_per_byte, :message_size, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at]
+
+  # FIXME add state machine validations, possibly with dm-is-state_machine
+  VALID_STATUSES = [:pending, :paid, :transmitting, :sent, :cancelled] 
   
   def message_path
     File.join(MESSAGE_STORE_PATH, self.uuid)
