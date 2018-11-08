@@ -57,7 +57,7 @@ end
 # upload a message, along with a bid (in millisatoshis)
 # return JSON object with status, uuid, and lightning payment invoice
 post '/order' do
-  param :bid, Float, required: true, min: MIN_PER_BYTE_BID
+  param :bid, Integer, required: true, min: MIN_PER_BYTE_BID
 
   # process the upload
   unless params[:file]
