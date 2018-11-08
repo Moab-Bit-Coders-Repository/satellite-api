@@ -21,13 +21,6 @@ before do
   content_type :json
 end
 
-# XXX DEBUG
-get '/info' do
-  # call lightning-charge info
-  response = $lightning_charge.get '/info'
-  response.body
-end
-
 # GET /queue
 # get snapshot of message queue
 get '/queue' do
@@ -36,14 +29,23 @@ get '/queue' do
             :order => [:created_at.desc]).to_json(:only => Order::PUBLIC_FIELDS)
 end
 
-get '/sent_messages' do
-  Order.all(:fields => Order::PUBLIC_FIELDS, 
-            :status => :sent,
-            :order => [:created_at.desc]).to_json(:only => Order::PUBLIC_FIELDS)
-end
+configure :development do
+  get '/sent_messages' do
+    Order.all(:fields => Order::PUBLIC_FIELDS, 
+              :status => :sent,
+              :order => [:created_at.desc]).to_json(:only => Order::PUBLIC_FIELDS)
+  end
 
-get '/message/:message_hash' do
-  send_file File.join(SENT_MESSAGE_STORE_PATH, params[:message_hash]), :disposition => 'attachment'
+  get '/message/:message_hash' do
+    send_file File.join(SENT_MESSAGE_STORE_PATH, params[:message_hash]), :disposition => 'attachment'
+  end
+
+  get '/info' do
+    # call lightning-charge info
+    response = $lightning_charge.get '/info'
+    response.body
+  end
+
 end
 
 # POST /order
@@ -104,8 +106,7 @@ post '/order' do
   order.created_at = Time.now
   order.save
   
-  # return lightning invoice
-  lightning_invoice_json
+  {:auth_token => auth_token, :lightning_invoice => lightning_invoice}.to_json
 end
 
 delete '/cancel/:uuid/:auth_token' do
