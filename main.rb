@@ -117,14 +117,22 @@ post '/order' do
   {:auth_token => auth_token, :lightning_invoice => lightning_invoice}.to_json
 end
 
-delete '/order/:uuid/:auth_token' do
-  unless hash_hmac('sha256', LIGHTNING_HOOK_KEY, params[:uuid]) == params[:auth_token]
-    halt 400, {:message => "Invalid authentication token", :errors => ["Invalid authentication token in callback"]}.to_json
-  end
-  
+def fetch_order(uuid, auth_token)
   unless order = Order.first(:uuid => params[:uuid])
-    halt 400, {:message => "Invalid order id", :errors => ["Invalid order #{params[:uuid]}"]}.to_json
+    halt 404, {:message => "Not found", :errors => ["Invalid order id #{params[:uuid]}"]}.to_json
   end
+
+  unless hash_hmac('sha256', LIGHTNING_HOOK_KEY, uuid) == auth_token
+    halt 401, {:message => "Unauthorized", :errors => ["Invalid authentication token"]}.to_json
+  end
+
+  return order
+end
+
+delete '/order/:uuid/:auth_token' do
+  param :uuid, String, required: true
+  param :auth_token, String, required: true
+  order = fetch_order(params[:uuid], params[:auth_token])
 
   unless [:pending, :paid].include?(order.status)
     halt 400, {:message => "Cannot cancel order", :errors => ["Order already #{order.status}"]}.to_json
@@ -137,13 +145,9 @@ end
 
 # invoice paid callback from charged
 post '/callback/:uuid/:auth_token' do
-  unless hash_hmac('sha256', LIGHTNING_HOOK_KEY, params[:uuid]) == params[:auth_token]
-    halt 400, {:message => "Invalid authentication token", :errors => ["Invalid authentication token in callback"]}.to_json
-  end
-  
-  unless order = Order.first(:uuid => params[:uuid])
-    halt 400, {:message => "Invalid order uuid", :errors => ["Invalid order #{params[:uuid]}"]}.to_json
-  end
+  param :uuid, String, required: true
+  param :auth_token, String, required: true
+  order = fetch_order(params[:uuid], params[:auth_token])
 
   unless order.status == :pending
     halt 400, {:message => "Payment problem", :errors => ["Order already #{order.status}"]}.to_json
