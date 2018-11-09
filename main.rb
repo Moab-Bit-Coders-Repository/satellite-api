@@ -85,7 +85,7 @@ post '/order' do
   order.message_size = message_size
   
   order.message_digest = sha256.to_s
-  order.bid_per_byte = order.bid.to_f / order.message_size.to_f
+  order.bid_per_byte = (order.bid.to_f / order.message_size.to_f).round(2)
   if order.bid_per_byte < MIN_PER_BYTE_BID
     halt 413, {:message => "Bid too low", :errors => ["Per byte bid cannot be below #{MIN_PER_BYTE_BID} millisatoshis per byte. The minimum bid for this message is #{order.message_size * MIN_PER_BYTE_BID} millisatoshis." ]}.to_json
   end
@@ -97,22 +97,29 @@ post '/order' do
     msatoshi: Integer(order.bid),
     description: LN_INVOICE_DESCRIPTION,
     expiry: LN_INVOICE_EXPIRY, 
-    metadata: {uuid: order.uuid, msatoshis_per_byte: order.bid, sha256_message_digest: order.message_digest},
-    webhook: callback_url(order.uuid, auth_token)
-  }
-  
+    metadata: {uuid: order.uuid, msatoshis_per_byte: order.bid, sha256_message_digest: order.message_digest}
+  }  
   unless charged_response.status == 201
-    halt 400, {:message => "Lightning Charge error", :errors => ["received #{response.status} from charged"]}.to_json
+    halt 400, {:message => "Lightning Charge invoice creation error", :errors => ["received #{response.status} from charged"]}.to_json
   end
 
-  lightning_invoice_json = charged_response.body
-  lightning_invoice = JSON.parse(lightning_invoice_json)
+  lightning_invoice = JSON.parse(charged_response.body)
+  invoice = Invoice.new(:lid => lightning_invoice["id"], :invoice => charged_response.body, :created_at => Time.now)
+
+  # register the webhook
+  webhook_registration_response = $lightning_charge.post "/invoice/#{invoice.lid}/webhook", {
+    url: callback_url(invoice.lid, auth_token)
+  }  
+  unless webhook_registration_response.status == 201
+    halt 400, {:message => "Lightning Charge webhook registration error", :errors => ["received #{response.status} from charged"]}.to_json
+  end
 
   order.status = :pending
-  order.lightning_invoiceid = lightning_invoice["id"]
-  order.lightning_invoice = lightning_invoice_json
   order.created_at = Time.now
+  puts "order: #{order.to_json}"
   order.save
+  invoice.order = order
+  invoice.save
   
   {:auth_token => auth_token, :lightning_invoice => lightning_invoice}.to_json
 end
@@ -121,12 +128,14 @@ def fetch_order(uuid, auth_token)
   unless order = Order.first(:uuid => params[:uuid])
     halt 404, {:message => "Not found", :errors => ["Invalid order id #{params[:uuid]}"]}.to_json
   end
+  authorize!(order, auth_token)
+end
 
-  unless hash_hmac('sha256', LIGHTNING_HOOK_KEY, uuid) == auth_token
+def authorize!(order, auth_token)
+  unless hash_hmac('sha256', LIGHTNING_HOOK_KEY, order.uuid) == auth_token
     halt 401, {:message => "Unauthorized", :errors => ["Invalid authentication token"]}.to_json
   end
-
-  return order
+  order
 end
 
 delete '/order/:uuid/:auth_token' do
@@ -144,16 +153,21 @@ delete '/order/:uuid/:auth_token' do
 end
 
 # invoice paid callback from charged
-post '/callback/:uuid/:auth_token' do
-  param :uuid, String, required: true
+post '/callback/:lightning_invoice_id/:auth_token' do
+  param :lightning_invoice_id, String, required: true
   param :auth_token, String, required: true
-  order = fetch_order(params[:uuid], params[:auth_token])
+  
+  unless invoice = Invoice.first(:invoiceid => params[:lightning_invoice_id])
+    halt 404, {:message => "Not found", :errors => ["Invalid invoice id #{params[:lightning_invoice_id]}"]}.to_json
+  end
+  order = authorize!(invoice.order, params[:auth_token])
 
   unless order.status == :pending
     halt 400, {:message => "Payment problem", :errors => ["Order already #{order.status}"]}.to_json
   end
+  invoice.update(:paid => true)
 
-  order.update(:status => :paid)
+  order.update(:status => :paid) if order.all_paid?
   
   {:message => "order paid"}.to_json
 end

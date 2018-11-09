@@ -10,6 +10,7 @@ MEGA_BYTE = 2 ** 20
 MAX_MESSAGE_SIZE = 1 * MEGA_BYTE
 LN_INVOICE_EXPIRY = 60 * 10 # ten minutes
 LN_INVOICE_DESCRIPTION = "BSS Test" # "Blockstream Satellite Transmission"
+MAX_LIGHTNING_INVOICE_SIZE = 1024
 
 CALLBACK_URI_ROOT = ENV['CALLBACK_URI_ROOT'] || "http://localhost:4567"
 
