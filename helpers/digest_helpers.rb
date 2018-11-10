@@ -1,4 +1,3 @@
-require 'sinatra/base'
 require 'openssl'
 
 def hash_hmac(digest, key, data)
