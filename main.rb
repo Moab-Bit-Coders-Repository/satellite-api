@@ -120,10 +120,12 @@ post '/order' do
   {:auth_token => order.user_auth_token, :lightning_invoice => lightning_invoice}.to_json
 end
 
-delete '/order/:uuid/:auth_token' do
+delete '/order/:uuid' do
   param :uuid, String, required: true
-  param :auth_token, String, required: true
+  param :auth_token, String, required: true, default: lambda { env['HTTP_X_AUTH_TOKEN'] },
+        message: "auth_token must be provided either in the DELETE body or in an X-Auth-Token header"
 
+  puts "params #{params.to_json}"
   unless [:pending, :paid].include?(order.status)
     halt 400, {:message => "Cannot cancel order", :errors => ["Order already #{order.status}"]}.to_json
   end
