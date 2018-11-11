@@ -57,6 +57,7 @@ end
 post '/order' do
   param :bid, Integer, required: true, min: MIN_PER_BYTE_BID
   param :file, Hash, required: true
+  bid = Integer(params[:bid])
 
   # process the upload
   unless tmpfile = params[:file][:tempfile]
@@ -66,7 +67,7 @@ post '/order' do
     halt 400, {:message => "Message upload problem", :errors => ["Filename missing"]}.to_json
   end
 
-  order = Order.new(:bid => params[:bid], :uuid => SecureRandom.uuid)
+  order = Order.new(:bid => bid, :uuid => SecureRandom.uuid)
   message_file = File.new(order.message_path, "wb")
   message_size = 0
   sha256 = OpenSSL::Digest::SHA256.new
@@ -88,36 +89,40 @@ post '/order' do
     halt 413, {:message => "Bid too low", :errors => ["Per byte bid cannot be below #{MIN_PER_BYTE_BID} millisatoshis per byte. The minimum bid for this message is #{order.message_size * MIN_PER_BYTE_BID} millisatoshis." ]}.to_json
   end
 
-  # generate Lightning invoice
-  charged_response = $lightning_charge.post '/invoice', {
-    msatoshi: Integer(order.bid),
-    description: LN_INVOICE_DESCRIPTION,
-    expiry: LN_INVOICE_EXPIRY, 
-    metadata: {uuid: order.uuid, msatoshis_per_byte: order.bid, sha256_message_digest: order.message_digest}
-  }  
-  unless charged_response.status == 201
-    halt 400, {:message => "Lightning Charge invoice creation error", :errors => ["received #{response.status} from charged"]}.to_json
-  end
-
-  lightning_invoice = JSON.parse(charged_response.body)
-  invoice = Invoice.new(:lid => lightning_invoice["id"], :invoice => charged_response.body, :created_at => Time.now)
-
-  # register the webhook
-  webhook_registration_response = $lightning_charge.post "/invoice/#{invoice.lid}/webhook", {
-    url: invoice.callback_url
-  }  
-  unless webhook_registration_response.status == 201
-    halt 400, {:message => "Lightning Charge webhook registration error", :errors => ["received #{response.status} from charged"]}.to_json
-  end
+  invoice = new_invoice(order, bid)
 
   order.status = :pending
   order.created_at = Time.now
-  puts "order: #{order.to_json}"
   order.save
   invoice.order = order
   invoice.save
   
-  {:auth_token => order.user_auth_token, :lightning_invoice => lightning_invoice}.to_json
+  {:auth_token => order.user_auth_token, :lightning_invoice => JSON.parse(invoice.invoice)}.to_json
+end
+
+post '/order/:uuid/bump' do
+  param :uuid, String, required: true
+  param :bid, Integer, required: true, min: MIN_PER_BYTE_BID
+  param :auth_token, String, required: true, default: lambda { env['HTTP_X_AUTH_TOKEN'] },
+        message: "auth_token must be provided either in the DELETE body or in an X-Auth-Token header"
+  bid = Integer(params[:bid])
+  
+  unless [:pending, :paid].include?(order.status)
+    halt 400, {:message => "Cannot bump order", :errors => ["Order already #{order.status}"]}.to_json
+  end
+  
+  unless bid > order.bid
+    halt 400, {:message => "Cannot bump order", :errors => ["New bid (#{bid}) must be larger than current bid (#{order.bid})"]}.to_json
+  end
+  
+  Order.transaction do
+    invoice = new_invoice(order, bid - order.bid)
+    order.update(:bid => bid, :status => :pending)
+    invoice.order = order
+    invoice.save
+  end
+  
+  {:message => "order bumped to #{order.bid}"}.to_json
 end
 
 delete '/order/:uuid' do
@@ -143,8 +148,10 @@ post '/callback/:lid/:charged_auth_token' do
     halt 400, {:message => "Payment problem", :errors => ["Order already #{invoice.order.status}"]}.to_json
   end
   
-  invoice.update(:paid => true)
-  invoice.order.update(:status => :paid) if invoice.order.all_paid?
+  Order.transaction do
+    invoice.update(:paid_at => Time.now)
+    invoice.order.update(:status => :paid) if invoice.order.all_paid?    
+  end
   
   {:message => "invoice #{invoice.lid} paid"}.to_json
 end

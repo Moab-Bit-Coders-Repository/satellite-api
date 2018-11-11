@@ -29,7 +29,7 @@ class Order
   
   # have all invoices been paid?
   def all_paid?
-    self.invoices(:fields => [:paid]).map {|i| i.paid}.reduce(:&)
+    self.invoices(:fields => [:paid_at]).map {|i| not i.paid_at.nil?}.reduce(:&)
   end
   
   USER_AUTH_KEY = hash_hmac('sha256', 'user-token', CHARGE_API_TOKEN)
