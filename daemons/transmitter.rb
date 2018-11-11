@@ -8,25 +8,21 @@ SLEEP_TIME = 1
 
 # loop forever dequing the highest-priced paid order and piping it to the GNU radio FIFO
 loop do
-  sendable_order = Order.first(:status => :paid, :order => [:bid.desc])
-  if sendable_order
-    # TODO handle IOErrors exceptions
-    sendable_order.status = :transmitting
-    sendable_order.upload_started_at = Time.now
-    sendable_order.save
-    
-    # TODO fix status updates and uploaded_at timestamps
-    File.open(sendable_order.message_path, "rb") do |message_file|
-      File.open(FIFO_PIPE_PATH, "wb") do |pipe|
-        IO.copy_stream(message_file, pipe, sendable_order.message_size)
-      end
+  sendable_order = nil
+  while sendable_order.nil? do
+    Order.transaction do
+      sendable_order = Order.first(:status => :paid, :order => [:bid.desc])
+      sendable_order.update(:status => :transmitting, :upload_started_at => Time.now) if sendable_order
     end
-    
-    sendable_order.status = :sent
-    sendable_order.upload_ended_at = Time.now
-    sendable_order.save
+    sleep SLEEP_TIME # TODO consider variable sleep to simulate transmission rate
+  end  
+  
+  # TODO handle IOErrors exceptions
+  File.open(sendable_order.message_path, "rb") do |message_file|
+    File.open(FIFO_PIPE_PATH, "wb") do |pipe|
+      IO.copy_stream(message_file, pipe, sendable_order.message_size)
+    end
   end
   
-  # TODO consider sleeping for as long as it will take to transmit the message just sent
-  sleep SLEEP_TIME
+  sendable_order.update(:status => :sent, :upload_ended_at => Time.now)
 end
