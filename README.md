@@ -1,6 +1,6 @@
 # Ionosphere
 
-c-lightning based Lapp that presents an API to submit messages for global broadcast over Blockstream Satellite and pay for them with Bitcoin Lightning payments.
+A lightning app (Lapp) based on c-lightning based. Presents an API to submit messages for global broadcast over Blockstream Satellite and pay for them with Bitcoin Lightning payments.
 
 A brief screencast demonstration is available [here](https://drive.google.com/file/d/1W-wjVwT0sGOS28dnfRrgG1S4DE5Xbnl_/view?usp=sharing).
 
@@ -28,13 +28,13 @@ docker run -e CHARGE_ROOT=http://api-token:token:mySecretToken@localhost:9112 -e
 
 ## REST API ##
 
-All endpoints accept and return data in JSON format.
+Each call to an API endpoint responds with a JSON object, whether the call is successful or results in an error.
 
-The code samples below assume that you've set `IONOSPHERE` to the public base URL of your server.
+The code samples below assume that you've set `IONOSPHERE` in your shell to the public base URL of your server.
 
 ### POST /order ###
 
-Place an order for a message transmission. The body of the POST must provide a file containing the message and a bid in millisatoshis. If the bid is below an allowed minimum millisatoshis per byte, an error is returned.
+Place an order for a message transmission. The body of the POST must provide a `file` containing the message and a `bid` in millisatoshis. If the bid is below an allowed minimum millisatoshis per byte, an error is returned.
 
 For example, to place an order to transmit the file `hello_world.png` with an initial bid of 10,000 millisatoshi, issue an HTTP POST request like this:
 
@@ -50,7 +50,7 @@ If successful, the response includes the JSON Lightning invoice as returned by L
 
 ### POST /order/:uuid/bump ###
 
-Increase the bid for an order sitting in the transmission queue. The new bid must be provided in the body of the POST and must be greater than the current bid. An `auth_token` must also be provided. For example, to bump up the bid on the order placed above to 700,000 millisatoshis, issue a POST like this:
+Increase the bid for an order sitting in the transmission queue. The new `bid` must be provided in the body of the POST and must be greater than the current bid. An `auth_token` must also be provided. For example, to bump up the bid on the order placed above to 700,000 millisatoshis, issue a POST like this:
 
 ```bash
 curl -v -F "bid=700000" -F "auth_token=d784e322dad7ec2671086ce3ad94e05108f2501180d8228577fbec4115774750" localhost:9292//order/409348bc-6af0-4999-b715-4136753979df/bump
