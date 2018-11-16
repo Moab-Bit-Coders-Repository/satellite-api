@@ -17,7 +17,6 @@ write_files:
         rpcport=${rpcport}
         txindex=1
         dbcache=4000
-        #debug=1
         logips=1
 
   - path: /home/bs/lightning.conf
@@ -46,13 +45,14 @@ write_files:
         RestartSec=3
         Environment=HOME=/home/bs
         ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+        ExecStartPre=/usr/bin/docker pull ${bitcoin_docker}
         ExecStart=/usr/bin/docker run \
             --network=host \
             --pid=host \
             --name=bitcoin \
             --tmpfs /tmp/ \
             -v /home/bs/bitcoin.conf:/root/.bitcoin/bitcoin.conf:ro \
-            -v /mnt/disks/data/bitcoin:/root/.bitcoin:rw \
+            -v /mnt/disks/data/testnet:/root/.bitcoin:rw \
             "${bitcoin_docker}" ${bitcoin_cmd}
         ExecStop=/usr/bin/docker exec bitcoin bitcoin-cli stop
         ExecStop=/usr/bin/sleep 20
@@ -73,6 +73,7 @@ write_files:
         RestartSec=3
         Environment=HOME=/home/bs
         ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+        ExecStartPre=/usr/bin/docker pull ${lightning_docker}
         ExecStartPre=/sbin/iptables -A INPUT -m tcp -p tcp --dport ${lightning_port} -j ACCEPT
         ExecStart=/usr/bin/docker run \
             --network=host \
@@ -88,6 +89,47 @@ write_files:
         ExecStopPost=/usr/bin/docker rm lightning
         ExecStopPost=/sbin/iptables -D INPUT -m tcp -p tcp --dport ${lightning_port} -j ACCEPT
 
+  - path: /etc/systemd/system/ionosphere.service
+    permissions: 0644
+    owner: root
+    content: |
+        [Unit]
+        Description=Ionosphere daemon
+        Wants=gcr-online.target
+        After=lightning.service
+
+        [Service]
+        Restart=always
+        RestartSec=3
+        Environment=HOME=/home/bs
+        ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+        ExecStartPre=/usr/bin/docker pull ${ionosphere_docker}
+        ExecStartPre=/sbin/iptables -A INPUT -p tcp -s localhost --dport 9112 -j ACCEPT
+        ExecStartPre=/sbin/iptables -A INPUT -p tcp --dport 9292 -j ACCEPT
+        ExecStartPre=/usr/bin/docker run \
+            --user root \
+            -v /mnt/disks/data/ionosphere:/data \
+            --entrypoint bash \
+            --rm \
+            "${ionosphere_docker}" \
+            -c 'chown -R ionosphere:ionosphere /data'
+        ExecStart=/usr/bin/docker run \
+            --network=host \
+            --pid=host \
+            --name=ionosphere \
+            --tmpfs /tmp/ \
+            -v /mnt/disks/data/ionosphere:/data \
+            -p 9292:9292 \
+            -e "CHARGE_ROOT=http://api-token:token:${rpcpass}@localhost:9112" \
+            -e "CALLBACK_URI_ROOT=http://${announce_addr}:9292" \
+            "${ionosphere_docker}"
+        ExecStop=/usr/bin/docker stop ionosphere
+        ExecStopPost=/usr/bin/docker rm ionosphere
+        ExecStopPost=/sbin/iptables -D INPUT -p tcp -s localhost --dport 9112 -j ACCEPT
+        ExecStopPost=/sbin/iptables -D INPUT -p tcp --dport 9292 -j ACCEPT
+
+
+
   - path: /etc/systemd/system/charge.service
     permissions: 0644
     owner: root
@@ -95,13 +137,14 @@ write_files:
         [Unit]
         Description=Charge instance
         Wants=gcr-online.target
-        After=lightning.service
+        After=ionosphere.service
 
         [Service]
         Restart=always
         RestartSec=200
         Environment=HOME=/home/bs
         ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+        ExecStartPre=/usr/bin/docker pull ${charge_docker}
         ExecStartPre=/sbin/iptables -A INPUT -p tcp -s localhost --dport 9112 -j ACCEPT
         ExecStart=/usr/bin/docker run \
             --network=host \

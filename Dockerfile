@@ -27,7 +27,6 @@ RUN apk --update add --virtual build_deps $BUILD_PACKAGES && \
 
 COPY . /app
 RUN chown -R ionosphere:ionosphere /app
-
 USER ionosphere
-EXPOSE 9282
+
 CMD ./docker_entrypoint.sh

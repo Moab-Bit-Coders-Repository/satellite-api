@@ -3,6 +3,11 @@ variable "project" {
   default = "blockstream-store"
 }
 
+variable "boot_image" {
+  type    = "string"
+  default = "cos-cloud/cos-stable"
+}
+
 variable "name" {
   type = "string"
 }
@@ -16,6 +21,10 @@ variable "charge_docker" {
 }
 
 variable "lightning_docker" {
+  type = "string"
+}
+
+variable "ionosphere_docker" {
   type = "string"
 }
 
@@ -41,11 +50,6 @@ variable "instance_type" {
 
 variable "data_image" {
   type = "string"
-}
-
-variable "boot_image" {
-  type    = "string"
-  default = "cos-cloud/cos-stable"
 }
 
 variable "net" {

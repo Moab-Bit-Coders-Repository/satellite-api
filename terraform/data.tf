@@ -1,4 +1,4 @@
 data "google_compute_image" "ionosphere" {
-  family    = "bitcoin-testnet"
+  family  = "btc-mainnet-testnet"
   project = "blockstream-store"
 }

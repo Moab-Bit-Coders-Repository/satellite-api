@@ -1,6 +1,6 @@
 # Ionosphere
 
-A lightning app (Lapp) based on c-lightning based. Presents an API to submit messages for global broadcast over Blockstream Satellite and pay for them with Bitcoin Lightning payments.
+A lightning app (Lapp) based on c-lightning. Presents an API to submit messages for global broadcast over Blockstream Satellite and pay for them with Bitcoin Lightning payments.
 
 A brief screencast demonstration is available [here](https://drive.google.com/file/d/1W-wjVwT0sGOS28dnfRrgG1S4DE5Xbnl_/view?usp=sharing).
 
@@ -14,7 +14,7 @@ Ionosphere itself is comprised of a RESTful API server and a transmitter daemon.
 
 The included `Dockerfile` builds a Docker file with the necessary gem dependencies, directory structure, and permissions. The included `docker_entrypoint.sh` runs the API server, transmitter daemon, and (optionally in development mode) a test daemon that simulates the GNU Radio application by reading from the FIFO and writing received messages to a tmp directory.
 
-After building a Docker image (`ionsosphere` in the example below), decide where you are going to keep your persisted data (`~/docker/data` in the example below) and run it like this:
+After building a Docker image (`ionosphere` in the example below), decide where you are going to keep your persisted data (`~/docker/data` in the example below) and run it like this:
 
 ```bash
 docker run -e CHARGE_ROOT=http://api-token:token:mySecretToken@localhost:9112 -e CALLBACK_URI_ROOT=http://my.public.ip:9292 -u `id -u` -v ~/docker/data:/data -p 9292:9292 -it ionosphere
