@@ -11,7 +11,8 @@ trap cleanup_before_exit SIGTERM
 
 mkdir -p /data/ionosphere
 mkdir -p /data/ionosphere/messages
-bundle exec rake upgrade
+bundle exec rake db:create
+bundle exec rake db:schema:load
 
 echo "starting transmitter_control"
 bundle exec ruby daemons/transmitter_control.rb start

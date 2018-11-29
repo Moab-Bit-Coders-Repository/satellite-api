@@ -2,7 +2,7 @@ module Sinatra
   module OrderHelpers
     
     def fetch_order_by_uuid
-      Order.first(:uuid => params[:uuid]) || halt(404, {:message => "Not found", :errors => ["Invalid order id"]}.to_json)
+      Order.where(uuid: params[:uuid]).first || halt(404, {:message => "Not found", :errors => ["Invalid order id"]}.to_json)
     end
     
     def authorize_order!(order)

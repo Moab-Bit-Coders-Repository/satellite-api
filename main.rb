@@ -1,12 +1,11 @@
 require 'sinatra'
+require "sinatra/activerecord"
 require "faraday"
-require 'data_mapper'
-require 'dm-noisy-failures'
 require 'securerandom'
 require 'openssl'
 
 require_relative 'constants'
-require_relative 'dm_config'
+require_relative 'db_config'
 require_relative 'helpers/init'
 
 configure do
@@ -45,9 +44,7 @@ get '/orders' do
   else
     statuses = [:paid] 
   end
-  Order.all(:fields => Order::PUBLIC_FIELDS, 
-            :status => statuses,
-            :order => [:bid_per_byte.desc]).to_json(:only => Order::PUBLIC_FIELDS)
+  Order.where(status: statuses).select(Order::PUBLIC_FIELDS).order(bid_per_byte: :desc).to_json(:only => Order::PUBLIC_FIELDS)
 end
 
 # POST /order
@@ -107,7 +104,7 @@ post '/order/:uuid/bump' do
         message: "auth_token must be provided either in the DELETE body or in an X-Auth-Token header"
   bid = Integer(params[:bid])
   
-  unless [:pending, :paid].include?(order.status)
+  unless [:pending, :paid].include?(order.status.to_sym)
     halt 400, {:message => "Cannot bump order", :errors => ["Order already #{order.status}"]}.to_json
   end
   
@@ -130,7 +127,7 @@ delete '/order/:uuid' do
   param :auth_token, String, required: true, default: lambda { env['HTTP_X_AUTH_TOKEN'] },
         message: "auth_token must be provided either in the DELETE body or in an X-Auth-Token header"
 
-  unless [:pending, :paid].include?(order.status)
+  unless [:pending, :paid].include?(order.status.to_sym)
     halt 400, {:message => "Cannot cancel order", :errors => ["Order already #{order.status}"]}.to_json
   end
   

@@ -1,71 +1,27 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.5.2)
-      public_suffix (>= 2.0.2, < 4.0)
-    bcrypt (3.1.12)
-    bcrypt-ruby (3.1.5)
-      bcrypt (>= 3.1.3)
+    activemodel (5.2.1)
+      activesupport (= 5.2.1)
+    activerecord (5.2.1)
+      activemodel (= 5.2.1)
+      activesupport (= 5.2.1)
+      arel (>= 9.0)
+    activesupport (5.2.1)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 0.7, < 2)
+      minitest (~> 5.1)
+      tzinfo (~> 1.1)
+    arel (9.0.0)
+    concurrent-ruby (1.1.3)
     daemons (1.2.6)
-    data_mapper (1.2.0)
-      dm-aggregates (~> 1.2.0)
-      dm-constraints (~> 1.2.0)
-      dm-core (~> 1.2.0)
-      dm-migrations (~> 1.2.0)
-      dm-serializer (~> 1.2.0)
-      dm-timestamps (~> 1.2.0)
-      dm-transactions (~> 1.2.0)
-      dm-types (~> 1.2.0)
-      dm-validations (~> 1.2.0)
-    data_objects (0.10.17)
-      addressable (~> 2.1)
-    dm-aggregates (1.2.0)
-      dm-core (~> 1.2.0)
-    dm-constraints (1.2.0)
-      dm-core (~> 1.2.0)
-    dm-core (1.2.1)
-      addressable (~> 2.3)
-    dm-do-adapter (1.2.0)
-      data_objects (~> 0.10.6)
-      dm-core (~> 1.2.0)
-    dm-migrations (1.2.0)
-      dm-core (~> 1.2.0)
-    dm-noisy-failures (0.2.3)
-      data_mapper
-    dm-serializer (1.2.2)
-      dm-core (~> 1.2.0)
-      fastercsv (~> 1.5)
-      json (~> 1.6)
-      json_pure (~> 1.6)
-      multi_json (~> 1.0)
-    dm-sqlite-adapter (1.2.0)
-      dm-do-adapter (~> 1.2.0)
-      do_sqlite3 (~> 0.10.6)
-    dm-timestamps (1.2.0)
-      dm-core (~> 1.2.0)
-    dm-transactions (1.2.0)
-      dm-core (~> 1.2.0)
-    dm-types (1.2.2)
-      bcrypt-ruby (~> 3.0)
-      dm-core (~> 1.2.0)
-      fastercsv (~> 1.5)
-      json (~> 1.6)
-      multi_json (~> 1.0)
-      stringex (~> 1.4)
-      uuidtools (~> 2.1)
-    dm-validations (1.2.0)
-      dm-core (~> 1.2.0)
-    do_sqlite3 (0.10.17)
-      data_objects (= 0.10.17)
     faraday (0.15.3)
       multipart-post (>= 1.2, < 3)
-    fastercsv (1.5.5)
-    json (1.8.6)
-    json_pure (1.8.6)
-    multi_json (1.13.1)
+    i18n (1.1.1)
+      concurrent-ruby (~> 1.0)
+    minitest (5.11.3)
     multipart-post (2.0.0)
     mustermann (1.0.3)
-    public_suffix (3.0.3)
     puma (3.12.0)
     rack (2.0.5)
     rack-protection (2.0.4)
@@ -76,26 +32,29 @@ GEM
       rack (~> 2.0)
       rack-protection (= 2.0.4)
       tilt (~> 2.0)
+    sinatra-activerecord (2.0.13)
+      activerecord (>= 3.2)
+      sinatra (>= 1.0)
     sinatra-param (1.5.0)
       sinatra (>= 1.3)
-    stringex (1.5.1)
+    sqlite3 (1.3.13)
+    thread_safe (0.3.6)
     tilt (2.0.8)
-    uuidtools (2.1.5)
+    tzinfo (1.2.5)
+      thread_safe (~> 0.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   daemons
-  data_mapper
-  dm-migrations
-  dm-noisy-failures
-  dm-sqlite-adapter
   faraday
   puma
   rake
   sinatra
+  sinatra-activerecord
   sinatra-param
+  sqlite3
 
 BUNDLED WITH
-   1.16.2
+   1.17.1

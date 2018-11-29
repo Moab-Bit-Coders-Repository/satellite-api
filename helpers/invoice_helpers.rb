@@ -4,7 +4,7 @@ module Sinatra
   module InvoiceHelpers
     
     def fetch_invoice_by_lid
-      Invoice.first(:lid => params[:lid]) || halt(404, {:message => "Not found", :errors => ["Invalid invoice id"]}.to_json)
+      Invoice.where(lid: params[:lid]).first || halt(404, {:message => "Not found", :errors => ["Invalid invoice id"]}.to_json)
     end
     
     def authorize_invoice!(invoice)

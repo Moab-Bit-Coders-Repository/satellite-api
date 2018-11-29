@@ -1,17 +1,13 @@
+require "sinatra/activerecord"
 require_relative '../constants'
 require_relative './orders'
 require_relative '../helpers/digest_helpers'
 
-class Invoice
-  include DataMapper::Resource
-  
-  property :id,         Serial
-  property :lid,        String,  :required => true, :key => true  # lightning invoice id
-  property :invoice,    String,  :required => true, :length => MAX_LIGHTNING_INVOICE_SIZE # lightning invoice JSON
-  property :paid_at,    DateTime
-  property :created_at, DateTime, :required => true
+class Invoice < ActiveRecord::Base
+  validates :lid, presence: true
+  validates :invoice, presence: true
 
-  belongs_to :order,   :key => true
+  belongs_to :order
   
   LIGHTNING_WEBHOOK_KEY = hash_hmac('sha256', 'charged-token', CHARGE_API_TOKEN)
   def charged_auth_token
