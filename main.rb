@@ -94,7 +94,7 @@ post '/order' do
   invoice.order = order
   invoice.save
   
-  {:auth_token => order.user_auth_token, :lightning_invoice => JSON.parse(invoice.invoice)}.to_json
+  {:auth_token => order.user_auth_token, :uuid => order.uuid, :lightning_invoice => JSON.parse(invoice.invoice)}.to_json
 end
 
 post '/order/:uuid/bump' do
