@@ -15,7 +15,7 @@ MIN_PER_BYTE_BID = (ENV['RACK_ENV'] == 'production') ? 100 : 1 # minimum price p
 MAX_MESSAGE_SIZE = 1 * MEGA_BYTE
 
 LN_INVOICE_EXPIRY = 60 * 10 # ten minutes
-LN_INVOICE_DESCRIPTION = ENV['RACK_ENV'] == 'production') ? "Blockstream Satellite Transmission" : "BSS Test"
+LN_INVOICE_DESCRIPTION = (ENV['RACK_ENV'] == 'production') ? "Blockstream Satellite Transmission" : "BSS Test"
 MAX_LIGHTNING_INVOICE_SIZE = 1024
 
 FIFO_PIPE_PATH = ENV['FIFO_PIPE_PATH'] || "/tmp/src" # named pipe with GNU radio sitting on the other end
