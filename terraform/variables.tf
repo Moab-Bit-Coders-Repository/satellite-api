@@ -3,6 +3,16 @@ variable "project" {
   default = "blockstream-store"
 }
 
+variable "ssl_cert" {
+  type    = "string"
+  default = ""
+}
+
+variable "host" {
+  type    = "string"
+  default = ""
+}
+
 # These could be overwritten by the ci with $CI_COMMIT_SHA, which is based on latest build
 variable "bitcoin_docker" {
   type    = "string"
@@ -21,5 +31,5 @@ variable "charge_docker" {
 
 variable "ionosphere_docker" {
   type    = "string"
-  default = "us.gcr.io/blockstream-store/ionosphere@sha256:8643d0a7e2d2825ca1e9ee2c51bc5ebbc545d521781198c8863baa69888fe89f"
+  default = "us.gcr.io/blockstream-store/ionosphere@sha256:3d4194ebb4dfbc3a0262a0b122aae058f0785c8723cf5498b293bade9ec26962"
 }

@@ -1,5 +1,3 @@
-# Individual resources
-
 # Instance group
 resource "google_compute_region_instance_group_manager" "blc" {
   name = "${var.name}-ig"
@@ -20,6 +18,8 @@ resource "google_compute_instance_template" "blc" {
     type = "lightning-app"
     name = "${var.name}"
   }
+
+  tags = ["http-server"]
 
   scheduling {
     automatic_restart   = true
@@ -43,14 +43,12 @@ resource "google_compute_instance_template" "blc" {
   network_interface {
     network = "${data.google_compute_network.blc.self_link}"
 
-    access_config {
-      nat_ip = "${element(var.announce_addr, count.index)}"
-    }
+    access_config {}
   }
 
   metadata {
     google-logging-enabled = "true"
-    "user-data"            = "${data.template_cloudinit_config.blc.rendered}"
+    user-data              = "${data.template_cloudinit_config.blc.rendered}"
   }
 
   service_account {
