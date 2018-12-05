@@ -28,10 +28,6 @@ variable "ionosphere_docker" {
   type = "string"
 }
 
-variable "announce_addr" {
-  type = "list"
-}
-
 variable "network" {
   type = "string"
 }
@@ -53,5 +49,13 @@ variable "data_image" {
 }
 
 variable "net" {
+  type = "string"
+}
+
+variable "ssl_cert" {
+  type = "string"
+}
+
+variable "host" {
   type = "string"
 }

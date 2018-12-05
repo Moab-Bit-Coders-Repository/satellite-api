@@ -11,7 +11,6 @@ data "template_file" "blc" {
     rpcport           = "${var.net == "testnet" ? "18332" : "8332"}"
     bitcoin_cmd       = "bitcoind ${var.net == "testnet" ? "-testnet" : ""} -printtoconsole"
     lightning_cmd     = "lightningd ${var.net == "testnet" ? "--testnet" : "--mainnet"} --conf=/root/.lightning/lightning.conf"
-    announce_addr     = "${element(var.announce_addr, count.index)}"
     lightning_port    = 9735
     bitcoin_docker    = "${var.bitcoin_docker}"
     lightning_docker  = "${var.lightning_docker}"

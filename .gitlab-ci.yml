@@ -16,9 +16,8 @@ before_script:
   - gcloud --version
 
 build_ionosphere:
-  except:
+  only:
     - master
-    - test_deploy
   stage: build
   script:
     - docker build -f Dockerfile -t us.gcr.io/blockstream-store/ionosphere:latest -t us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA .
@@ -27,7 +26,7 @@ build_ionosphere:
 deploy_ionosphere:
   stage: deploy
   only:
-    - test_deploy
+    - tags@satellite/ionosphere
   script:
     - (cd terraform && terraform init)
     - (cd terraform && terraform apply -input=false -auto-approve)
