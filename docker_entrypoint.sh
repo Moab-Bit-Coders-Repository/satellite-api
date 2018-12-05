@@ -18,7 +18,7 @@ if [[ $RACK_ENV = "development" ]]; then
         bundle exec ruby test/fifo2files_control.rb start
 fi
 
-bundle exec rackup --host 0.0.0.0
+bundle exec ruby app.rb
 
 
 # shutdown the entire process when any of the background jobs exits (even if successfully)
