@@ -16,6 +16,11 @@ module Sinatra
     def order
       @order ||= authorize_order!(fetch_order_by_uuid)
     end
+    
+    def order_status_sse(order)
+      "event: #{order.status}\n" \
+      "data: #{order.to_json(:only => Order::PUBLIC_FIELDS)}\n\n"
+    end
 
   end
   helpers OrderHelpers

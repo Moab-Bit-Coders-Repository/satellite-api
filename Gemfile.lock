@@ -15,6 +15,7 @@ GEM
     arel (9.0.0)
     concurrent-ruby (1.1.3)
     daemons (1.2.6)
+    eventmachine (1.2.7)
     faraday (0.15.3)
       multipart-post (>= 1.2, < 3)
     i18n (1.1.1)
@@ -22,7 +23,6 @@ GEM
     minitest (5.11.3)
     multipart-post (2.0.0)
     mustermann (1.0.3)
-    puma (3.12.0)
     rack (2.0.5)
     rack-protection (2.0.4)
       rack
@@ -40,6 +40,10 @@ GEM
     sinatra-param (1.5.0)
       sinatra (>= 1.3)
     sqlite3 (1.3.13)
+    thin (1.7.2)
+      daemons (~> 1.0, >= 1.0.9)
+      eventmachine (~> 1.0, >= 1.0.4)
+      rack (>= 1, < 3)
     thread_safe (0.3.6)
     tilt (2.0.8)
     tzinfo (1.2.5)
@@ -50,15 +54,16 @@ PLATFORMS
 
 DEPENDENCIES
   daemons
+  eventmachine
   faraday
   minitest
-  puma
   rack-test
   rake
   sinatra
   sinatra-activerecord
   sinatra-param
   sqlite3
+  thin
 
 BUNDLED WITH
    1.17.1
