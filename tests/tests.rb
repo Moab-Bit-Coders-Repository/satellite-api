@@ -15,7 +15,7 @@ class MainAppTest < Minitest::Test
   `curl -o #{TEST_FILE} https://raw.githubusercontent.com/scijs/baboon-image/master/baboon.png`
  
   def app
-    Sinatra::Application
+    Ionosphere
   end
  
   def setup
