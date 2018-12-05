@@ -5,9 +5,8 @@ gem "sinatra-param", require: "sinatra/param"
 gem "sinatra-activerecord"
 gem "sqlite3"
 gem "faraday" # HTTP client library
-gem "eventmachine"
 gem 'daemons'
-gem 'thin'
+gem 'puma'
 gem 'rake'
 
 group :test do
