@@ -17,7 +17,7 @@ class MainAppTest < Minitest::Test
   end
  
   def app
-    Ionosphere
+    Sinatra::Application
   end
  
   def setup
