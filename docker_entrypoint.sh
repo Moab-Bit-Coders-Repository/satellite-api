@@ -2,7 +2,6 @@
 set -eo pipefail
 
 function cleanup_before_exit {
-  bundle exec ruby daemons/transmitter_control.rb stop
   bundle exec ruby test/fifo2files_control.rb stop
   'kill `jobs -p`'
 }
@@ -13,9 +12,6 @@ mkdir -p /data/ionosphere
 mkdir -p /data/ionosphere/messages
 bundle exec rake db:create
 bundle exec rake db:schema:load
-
-echo "starting transmitter_control"
-bundle exec ruby daemons/transmitter_control.rb start
 
 if [[ $RACK_ENV = "development" ]]; then
         echo "starting fifo2files"
