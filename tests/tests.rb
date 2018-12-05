@@ -12,7 +12,9 @@ require_relative '../main'
 class MainAppTest < Minitest::Test
   include Rack::Test::Methods 
 
-  `curl -o #{TEST_FILE} https://raw.githubusercontent.com/scijs/baboon-image/master/baboon.png`
+  unless File.exists?(TEST_FILE)
+    `curl -o #{TEST_FILE} https://raw.githubusercontent.com/scijs/baboon-image/master/baboon.png`
+  end
  
   def app
     Ionosphere
