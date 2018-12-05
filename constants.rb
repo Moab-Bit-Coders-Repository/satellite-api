@@ -2,7 +2,7 @@ ENV['RACK_ENV'] ||= 'development'
 KILO_BYTE = 2 ** 10
 MEGA_BYTE = 2 ** 20
 
-DB_ROOT = ENV['DB_ROOT'] || (ENV['RACK_ENV'] == 'prFIFO_PDU_SIZE_IN_BYTESn') ? '/data/ionosphere' : './db'
+DB_ROOT = ENV['DB_ROOT'] || (ENV['RACK_ENV'] == 'production') ? '/data/ionosphere' : './db'
 DB_PATH = File.join(DB_ROOT, "ionosphere_#{ENV['RACK_ENV']}.sqlite3")
 MESSAGE_STORE_PATH = ENV['MESSAGE_STORE_PATH'] || File.join(DB_ROOT, 'messages')
 SENT_MESSAGE_STORE_PATH = File.join(MESSAGE_STORE_PATH, 'sent')
