@@ -17,13 +17,13 @@ The included `Dockerfile` builds a Docker file with the necessary gem dependenci
 After building a Docker image (`ionosphere` in the example below), decide where you are going to keep your persisted data (`~/docker/data` in the example below) and run it like this:
 
 ```bash
-docker run -e CHARGE_ROOT=http://api-token:token:mySecretToken@localhost:9112 -e CALLBACK_URI_ROOT=http://my.public.ip:9292 -u `id -u` -v ~/docker/data:/data -p 9292:9292 -it ionosphere
+docker run -e CHARGE_ROOT=http://api-token:mySecretToken@localhost:9112 -e CALLBACK_URI_ROOT=http://my.public.ip:9292 -u `id -u` -v ~/docker/data:/data -p 9292:9292 -it ionosphere
 ```
 
 To run in developer mode, set the `RACK_ENV` environment variable like this:
 
 ```bash
-docker run -e CHARGE_ROOT=http://api-token:token:mySecretToken@localhost:9112 -e CALLBACK_URI_ROOT=http://my.public.ip:9292 -e RACK_ENV=development -u `id -u` -v ~/docker/data:/data -p 9292:9292 -it ionosphere
+docker run -e CHARGE_ROOT=http://api-token:mySecretToken@localhost:9112 -e CALLBACK_URI_ROOT=http://my.public.ip:9292 -e RACK_ENV=development -u `id -u` -v ~/docker/data:/data -p 9292:9292 -it ionosphere
 ```
 
 ## REST API ##
