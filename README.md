@@ -95,6 +95,6 @@ In development mode (i.e. when the ```RACK_ENV``` environment variable is set to
 
 ## Future Work ##
 
-* Configure `Rack::Attack` to block and throttle abusive requests.
+* Configure `Rack::Attack` or similar to block and throttle abusive requests.
 * Support bids priced in fiat currencies.
 * Report the top bid_per_byte, queue depth, and estimated time to transmit in the response to `POST /order`.
