@@ -5,7 +5,7 @@ require 'securerandom'
 require 'openssl'
 
 require_relative 'constants'
-require_relative 'db_config'
+require_relative './models/init'
 require_relative 'helpers/init'
 
 configure do
