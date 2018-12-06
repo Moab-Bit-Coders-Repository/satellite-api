@@ -1,9 +1,8 @@
-require 'data_mapper'
+require 'active_record'
 require 'json'
 
-require_relative '../db_config'
 require_relative '../fifo_config'
-require_relative '../constants'
+require_relative '../models/init'
 
 SLEEP_TIME = 1
 
