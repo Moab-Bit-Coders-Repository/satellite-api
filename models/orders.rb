@@ -18,7 +18,6 @@ class Order < ActiveRecord::Base
   validates :message_digest, presence: true
   validates :status, presence: true
   validates :uuid, presence: true
-  validates :created_at, presence: true
 
   has_many :invoices
   

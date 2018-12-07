@@ -32,7 +32,7 @@ module Sinatra
       end
 
       lightning_invoice = JSON.parse(charged_response.body)
-      invoice = Invoice.new(:lid => lightning_invoice["id"], :invoice => charged_response.body, :created_at => Time.now)
+      invoice = Invoice.new(:lid => lightning_invoice["id"], :invoice => charged_response.body)
 
       # register the webhook
       webhook_registration_response = $lightning_charge.post "/invoice/#{invoice.lid}/webhook", {
