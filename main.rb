@@ -127,11 +127,9 @@ delete '/order/:uuid' do
   param :auth_token, String, required: true, default: lambda { env['HTTP_X_AUTH_TOKEN'] },
         message: "auth_token must be provided either in the DELETE body or in an X-Auth-Token header"
 
-  unless [:pending, :paid].include?(order.status.to_sym)
+  unless order.cancel!
     halt 400, {:message => "Cannot cancel order", :errors => ["Order already #{order.status}"]}.to_json
   end
-  
-  order.update(:status => :cancelled)
 
   {:message => "order cancelled"}.to_json
 end
@@ -141,7 +139,7 @@ post '/callback/:lid/:charged_auth_token' do
   param :lid, String, required: true
   param :charged_auth_token, String, required: true
 
-  unless invoice.order.status == :pending
+  unless invoice.pay!
     halt 400, {:message => "Payment problem", :errors => ["Order already #{invoice.order.status}"]}.to_json
   end
   

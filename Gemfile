@@ -8,6 +8,7 @@ gem "faraday" # HTTP client library
 gem 'daemons'
 gem 'puma'
 gem 'rake'
+gem 'aasm'
 
 group :test do
   gem 'minitest'

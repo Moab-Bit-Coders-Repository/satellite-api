@@ -1,8 +1,11 @@
+require 'aasm'
 require_relative '../constants'
 require_relative './invoices'
 require_relative '../helpers/digest_helpers'
 
 class Order < ActiveRecord::Base
+  include AASM
+  
   PUBLIC_FIELDS = [:bid, :bid_per_byte, :message_size, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at]
 
   # FIXME add state machine validations, possibly with dm-is-state_machine
@@ -18,6 +21,41 @@ class Order < ActiveRecord::Base
   validates :created_at, presence: true
 
   has_many :invoices
+  
+   
+  aasm :column => :status, :enum => true, :whiny_transitions => false, :no_direct_assignment => true do
+    state :pending, initial: true
+    state :paid
+    state :transmitting, before_enter: Proc.new { self.upload_started_at = Time.now }
+    state :sent, before_enter: Proc.new { self.upload_ended_at = Time.now }
+    state :cancelled, before_enter: Proc.new { self.cancelled_at = Time.now }
+    
+    after_all_transitions :log_status_change
+    
+    event :pay do
+      transitions :from => :pending, :to => :paid
+    end
+
+    event :start_transmission do
+      transitions :from => :paid, :to => :transmitting
+    end
+
+    event :end_transmission do
+      transitions :from => :transmitting, :to => :sent
+    end
+
+    event :cancel do
+      transitions :from => [:pending, :paid], :to => :cancelled
+    end
+    
+    event :bump do
+      transitions :from => [:pending, :paid], :to => :pending
+    end
+  end
+  
+  def log_status_change
+    puts "changing from #{aasm.from_state} to #{aasm.to_state} (event: #{aasm.current_event})"
+  end
   
   def message_path
     File.join(MESSAGE_STORE_PATH, self.uuid)
