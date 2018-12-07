@@ -27,7 +27,7 @@ class MainAppTest < Minitest::Test
   end  
   
   def write_response
-    File.open('response.html', 'w') { |file| file.write(last_response.body) }    
+    File.open('response.html', 'w') { |file| file.write(last_response.to_json) }    
   end
 
   def test_get_orders
@@ -66,6 +66,7 @@ class MainAppTest < Minitest::Test
     header 'X-Auth-Token', @order['auth_token']
     post "/order/#{@order_uuid}/bump", params={"bid" => DEFAULT_BID + 1}
     assert last_response.ok?
+    write_response
     r = JSON.parse(last_response.body)
     refute_nil r['auth_token']
     refute_nil r['uuid']

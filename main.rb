@@ -100,7 +100,7 @@ post '/order/:uuid/bump' do
         message: "auth_token must be provided either in the DELETE body or in an X-Auth-Token header"
   bid = Integer(params[:bid])
   
-  unless [:pending, :paid].include?(order.status.to_sym)
+  unless order.bump
     halt 400, {:message => "Cannot bump order", :errors => ["Order already #{order.status}"]}.to_json
   end
   
@@ -111,7 +111,6 @@ post '/order/:uuid/bump' do
   Order.transaction do
     invoice = new_invoice(order, bid - order.bid)
     order.bid = bid
-    order.bump
     order.save
     invoice.order = order
     invoice.save
@@ -137,7 +136,7 @@ post '/callback/:lid/:charged_auth_token' do
   param :lid, String, required: true
   param :charged_auth_token, String, required: true
 
-  unless invoice.pay!
+  unless invoice.pay
     halt 400, {:message => "Payment problem", :errors => ["Order already #{invoice.order.status}"]}.to_json
   end
   
