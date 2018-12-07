@@ -79,9 +79,8 @@ post '/order' do
   message_file.close()
 
   order.message_size = message_size
-  
   order.message_digest = sha256.to_s
-  order.bid_per_byte = (order.bid.to_f / order.message_size.to_f).round(2)
+  order.set_bid_per_byte
   if order.bid_per_byte < MIN_PER_BYTE_BID
     halt 413, {:message => "Bid too low", :errors => ["Per byte bid cannot be below #{MIN_PER_BYTE_BID} millisatoshis per byte. The minimum bid for this message is #{order.message_size * MIN_PER_BYTE_BID} millisatoshis." ]}.to_json
   end
@@ -113,7 +112,6 @@ post '/order/:uuid/bump' do
   Order.transaction do
     invoice = new_invoice(order, bid - order.bid)
     order.bid = bid
-    order.bid_per_byte = (order.bid.to_f / order.message_size.to_f).round(2)
     order.bump
     order.save
     invoice.order = order
