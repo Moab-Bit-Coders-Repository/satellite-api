@@ -88,7 +88,6 @@ post '/order' do
 
   invoice = new_invoice(order, bid)
 
-  order.status = :pending
   order.created_at = Time.now
   order.save
   invoice.order = order
