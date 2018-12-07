@@ -88,9 +88,9 @@ post '/order' do
 
   invoice = new_invoice(order, bid)
 
-  order.save
+  order.save!
   invoice.order = order
-  invoice.save
+  invoice.save!
   
   {:auth_token => order.user_auth_token, :uuid => order.uuid, :lightning_invoice => JSON.parse(invoice.invoice)}.to_json
 end
