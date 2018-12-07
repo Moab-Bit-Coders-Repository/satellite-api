@@ -56,6 +56,8 @@ Increase the bid for an order sitting in the transmission queue. The new `bid` m
 curl -v -F "bid=700000" -F "auth_token=d784e322dad7ec2671086ce3ad94e05108f2501180d8228577fbec4115774750" localhost:9292//order/409348bc-6af0-4999-b715-4136753979df/bump
 ```
 
+Response object is in the same format as for `POST /order`.
+
 As shown below for DELETE, the `auth_token` may alternatively be provided using the `X-Auth-Token` HTTP header.
 
 ### DELETE /order/:uuid ###

@@ -114,12 +114,15 @@ post '/order/:uuid/bump' do
   
   Order.transaction do
     invoice = new_invoice(order, bid - order.bid)
-    order.update(:bid => bid, :status => :pending)
+    order.bid = bid
+    order.bid_per_byte = (order.bid.to_f / order.message_size.to_f).round(2)
+    order.bump
+    order.save
     invoice.order = order
     invoice.save
   end
   
-  {:message => "order bumped to #{order.bid}"}.to_json
+  {:auth_token => order.user_auth_token, :uuid => order.uuid, :lightning_invoice => JSON.parse(invoice.invoice)}.to_json
 end
 
 delete '/order/:uuid' do

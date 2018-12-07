@@ -41,6 +41,7 @@ class MainAppTest < Minitest::Test
     assert last_response.ok?
     r = JSON.parse(last_response.body)
     refute_nil r['auth_token']
+    refute_nil r['uuid']
     refute_nil r['lightning_invoice']
   end
   
@@ -64,7 +65,11 @@ class MainAppTest < Minitest::Test
   def test_bump
     header 'X-Auth-Token', @order['auth_token']
     post "/order/#{@order_uuid}/bump", params={"bid" => DEFAULT_BID + 1}
-    assert last_response.ok?    
+    assert last_response.ok?
+    r = JSON.parse(last_response.body)
+    refute_nil r['auth_token']
+    refute_nil r['uuid']
+    refute_nil r['lightning_invoice']    
   end
 
   def test_that_bumping_down_fails
