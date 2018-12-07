@@ -5,7 +5,7 @@ require_relative '../helpers/digest_helpers'
 
 class Order < ActiveRecord::Base
   include AASM
-  before_save :set_bid_per_byte
+  before_validation :set_bid_per_byte
   
   PUBLIC_FIELDS = [:bid, :bid_per_byte, :message_size, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at]
 
@@ -13,9 +13,10 @@ class Order < ActiveRecord::Base
   VALID_STATUSES = [:pending, :paid, :transmitting, :sent, :cancelled]
   
   enum status: [:pending, :paid, :transmitting, :sent, :cancelled]
-  validates :bid, presence: true
-  validates :message_size, presence: true
+  validates :bid, presence: true, numericality: { only_integer: true }
+  validates :message_size, presence: true, numericality: { only_integer: true }
   validates :message_digest, presence: true
+  validates :bid_per_byte, presence: true, numericality: { greater_than_or_equal_to: MIN_PER_BYTE_BID }
   validates :status, presence: true
   validates :uuid, presence: true
 
@@ -69,8 +70,16 @@ class Order < ActiveRecord::Base
     hash_hmac('sha256', USER_AUTH_KEY, self.uuid)
   end
 
+  def bid_per_byte
+    super || self.computed_bid_per_byte
+  end
+
+  def computed_bid_per_byte
+    (self.bid.nil? or self.message_size.nil?) ? nil : (self.bid.to_f / self.message_size.to_f).round(2)
+  end
+
   def set_bid_per_byte
-    self.bid_per_byte = (self.bid.to_f / self.message_size.to_f).round(2)    
+    self.bid_per_byte = self.computed_bid_per_byte
   end
 
 end

@@ -52,7 +52,7 @@ end
 # upload a message, along with a bid (in millisatoshis)
 # return JSON object with status, uuid, and lightning payment invoice
 post '/order' do
-  param :bid, Integer, required: true, min: MIN_PER_BYTE_BID
+  param :bid, Integer, required: true
   param :file, Hash, required: true
   bid = Integer(params[:bid])
 
@@ -80,7 +80,6 @@ post '/order' do
 
   order.message_size = message_size
   order.message_digest = sha256.to_s
-  order.set_bid_per_byte
   if order.bid_per_byte < MIN_PER_BYTE_BID
     halt 413, {:message => "Bid too low", :errors => ["Per byte bid cannot be below #{MIN_PER_BYTE_BID} millisatoshis per byte. The minimum bid for this message is #{order.message_size * MIN_PER_BYTE_BID} millisatoshis." ]}.to_json
   end
@@ -96,7 +95,7 @@ end
 
 post '/order/:uuid/bump' do
   param :uuid, String, required: true
-  param :bid, Integer, required: true, min: MIN_PER_BYTE_BID
+  param :bid, Integer, required: true
   param :auth_token, String, required: true, default: lambda { env['HTTP_X_AUTH_TOKEN'] },
         message: "auth_token must be provided either in the DELETE body or in an X-Auth-Token header"
   bid = Integer(params[:bid])
