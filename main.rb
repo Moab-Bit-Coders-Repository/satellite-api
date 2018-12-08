@@ -85,10 +85,11 @@ post '/order' do
   end
 
   invoice = new_invoice(order, bid)
-
-  order.save!
-  invoice.order = order
-  invoice.save!
+  Order.transaction do
+    order.save
+    invoice.order = order
+    invoice.save
+  end
   
   {:auth_token => order.user_auth_token, :uuid => order.uuid, :lightning_invoice => JSON.parse(invoice.invoice)}.to_json
 end
@@ -107,10 +108,10 @@ post '/order/:uuid/bump' do
   unless bid > order.bid
     halt 400, {:message => "Cannot bump order", :errors => ["New bid (#{bid}) must be larger than current bid (#{order.bid})"]}.to_json
   end
+  order.bid = bid
   
+  invoice = new_invoice(order, bid - order.bid)
   Order.transaction do
-    invoice = new_invoice(order, bid - order.bid)
-    order.bid = bid
     order.save
     invoice.order = order
     invoice.save
