@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-ENV BITCOIN_VERSION=0.17.0
+ENV BITCOIN_VERSION=0.17.0.1
 ENV BITCOIN_DIR_VERSION=0.17.0
 ENV BITCOIN_PGP_KEY=0x90C8019E36C2E964
 ENV GLIBC_VERSION=2.27-r0
@@ -27,4 +27,3 @@ RUN gpg --keyserver keyserver.ubuntu.com --recv-keys ${BITCOIN_PGP_KEY} \
 	&& rm -rf /glibc-${GLIBC_VERSION}.apk \
 	&& rm -rf /glibc-bin-${GLIBC_VERSION}.apk
 
-EXPOSE 8333 8332 18333 18332

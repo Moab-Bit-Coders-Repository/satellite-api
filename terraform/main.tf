@@ -12,6 +12,11 @@ provider "google" {
   project = "${var.project}"
 }
 
+data "google_compute_image" "ionosphere" {
+  family  = "btc-mainnet-testnet"
+  project = "blockstream-store"
+}
+
 module "blc" {
   source = "modules/blc"
 

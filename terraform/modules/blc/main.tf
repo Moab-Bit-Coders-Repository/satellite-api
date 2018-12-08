@@ -19,8 +19,6 @@ resource "google_compute_instance_template" "blc" {
     name = "${var.name}"
   }
 
-  tags = ["http-server"]
-
   scheduling {
     automatic_restart   = true
     on_host_maintenance = "MIGRATE"

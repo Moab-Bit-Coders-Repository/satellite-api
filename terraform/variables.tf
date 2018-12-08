@@ -16,7 +16,7 @@ variable "host" {
 # These could be overwritten by the ci with $CI_COMMIT_SHA, which is based on latest build
 variable "bitcoin_docker" {
   type    = "string"
-  default = "us.gcr.io/blockstream-store/bitcoind017@sha256:95f33d3df18809cc5aab293a3fc01fc33e8fab63a5dc1d54af627ed7cffd9b37"
+  default = "us.gcr.io/blockstream-store/bitcoind017@sha256:7577cd3cb0620ca9f6abffb3814dbb78b6faa1f8debf07d7dfd16cb192feecd9"
 }
 
 variable "lightning_docker" {
@@ -31,5 +31,5 @@ variable "charge_docker" {
 
 variable "ionosphere_docker" {
   type    = "string"
-  default = "us.gcr.io/blockstream-store/ionosphere@sha256:3d4194ebb4dfbc3a0262a0b122aae058f0785c8723cf5498b293bade9ec26962"
+  default = "us.gcr.io/blockstream-store/ionosphere@sha256:be361f13cd8d681b2927670ff673e7bf70060dca73d856d8594914e23f9a601d"
 }

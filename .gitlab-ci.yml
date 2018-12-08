@@ -22,6 +22,7 @@ build_ionosphere:
   script:
     - docker build -f Dockerfile -t us.gcr.io/blockstream-store/ionosphere:latest -t us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA .
     - docker push us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA
+    - docker push us.gcr.io/blockstream-store/ionosphere:latest
 
 deploy_ionosphere:
   stage: deploy
@@ -29,4 +30,6 @@ deploy_ionosphere:
     - tags@satellite/ionosphere
   script:
     - (cd terraform && terraform init)
-    - (cd terraform && terraform apply -input=false -auto-approve)
+    - (cd terraform && terraform apply \
+      -var "ionosphere_docker=us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA"
+      -input=false -auto-approve)
