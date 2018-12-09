@@ -21,6 +21,4 @@ LN_INVOICE_EXPIRY = 60 * 10 # ten minutes
 LN_INVOICE_DESCRIPTION = (ENV['RACK_ENV'] == 'production') ? "Blockstream Satellite Transmission" : "BSS Test"
 MAX_LIGHTNING_INVOICE_SIZE = 1024
 
-FIFO_PIPE_PATH = ENV['FIFO_PIPE_PATH'] || "/tmp/src" # named pipe with GNU radio sitting on the other end
-FIFO_PDU_SIZE = ENV['FIFO_PDU_SIZE'] || 1024 # bytes
-FIFO_RATE_LIMIT = ENV['FIFO_RATE_LIMIT'] || 8 * KILO_BYTE # bytes per second
+TRANSMIT_RATE_LIMIT = ENV['TRANSMIT_RATE_LIMIT'] # bytes per second
