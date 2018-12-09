@@ -102,9 +102,10 @@ post '/order/:uuid/bump' do
   unless bid > order.bid
     halt 400, {:message => "Cannot bump order", :errors => ["New bid (#{bid}) must be larger than current bid (#{order.bid})"]}.to_json
   end
-  order.bid = bid
   
   invoice = new_invoice(order, bid - order.bid)
+  order.bid = bid
+
   Order.transaction do
     order.save
     invoice.order = order
