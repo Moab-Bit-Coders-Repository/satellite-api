@@ -79,12 +79,12 @@ curl -v -X DELETE -H "X-Auth-Token: 5248b13a722cd9b2e17ed3a2da8f7ac6bd9a8fe71303
 Retrieve a list of paid, but unsent orders. In development mode, a broader set of orders can be retrieved using the query parameter `status` to provide a filter in the form of a comma-separated list of order statuses. The valid order statuses are: `pending`, `paid`, `transmitting`, `sent`, and `cancelled`.
 
 ```bash
-curl $IONOSPHERE/queue
+curl $IONOSPHERE/orders
 ```
 
 ```bash
 export RACK_ENV=development
-curl $IONOSPHERE/queue?status=pending,transmitting,cancelled
+curl $IONOSPHERE/orders?status=pending,transmitting,cancelled
 ```
 
 The response is a JSON array of records (one for each queued message). The revealed fields for each record include: `bid`, `message_size`, `message_digest`, `status`, `created_at`, `upload_started_at`, and `upload_ended_at`.
