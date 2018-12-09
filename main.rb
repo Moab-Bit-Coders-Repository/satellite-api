@@ -20,16 +20,11 @@ before do
 end
 
 configure :development do
-  get '/message/:message_hash' do
-    send_file File.join(SENT_MESSAGE_STORE_PATH, params[:message_hash]), :disposition => 'attachment'
-  end
-
   get '/info' do
     # call lightning-charge info
     response = $lightning_charge.get '/info'
     response.body
   end
-
 end
 
 # GET /orders
@@ -39,6 +34,10 @@ get '/orders' do
   param :status, String, required: false, default: "paid"
   statuses = (params[:status].split(',').map(&:to_sym) & Order::VALID_STATUSES)
   Order.where(status: statuses).select(Order::PUBLIC_FIELDS).order(bid_per_byte: :desc).to_json(:only => Order::PUBLIC_FIELDS)
+end
+
+get '/message/:message_hash' do
+  send_file File.join(SENT_MESSAGE_STORE_PATH, params[:message_hash]), :disposition => 'attachment'
 end
 
 # POST /order
