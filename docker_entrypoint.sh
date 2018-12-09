@@ -8,8 +8,10 @@ function cleanup_before_exit {
 
 trap cleanup_before_exit SIGTERM
 
+export DB_ROOT='/data/ionosphere'
 mkdir -p /data/ionosphere
 mkdir -p /data/ionosphere/messages
+mkdir -p /data/ionosphere/messages/sent
 
 if [ ! -f /data/ionosphere/ionosphere_production.sqlite3 ]; then
         bundle exec rake db:create
