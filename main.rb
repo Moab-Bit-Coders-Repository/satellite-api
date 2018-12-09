@@ -35,15 +35,9 @@ end
 # GET /orders
 # params: 
 #   status - a comma-separated list of order statuses to return
-# If not in development mode, only paid, but unsent orders are returned
 get '/orders' do
   param :status, String, required: false, default: "paid"
-  
-  if settings.environment == :development
-    statuses = (params[:status].split(',').map(&:to_sym) & Order::VALID_STATUSES)
-  else
-    statuses = [:paid] 
-  end
+  statuses = (params[:status].split(',').map(&:to_sym) & Order::VALID_STATUSES)
   Order.where(status: statuses).select(Order::PUBLIC_FIELDS).order(bid_per_byte: :desc).to_json(:only => Order::PUBLIC_FIELDS)
 end
 
