@@ -12,7 +12,7 @@ RUN apk update && \
     echo 'gem: --no-document' > /etc/gemrc
 
 RUN mkdir /app && \
-    mkdir /data
+    mkdir -p /data/ionosphere
 
 COPY Gemfile /app
 COPY Gemfile.lock /app
