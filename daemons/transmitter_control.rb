@@ -1,3 +1,6 @@
+require 'active_record'
+require_relative '../constants'
+require_relative '../models/init'
 require 'daemons'
 
 options = {
