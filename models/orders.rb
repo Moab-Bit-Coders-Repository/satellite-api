@@ -29,8 +29,6 @@ class Order < ActiveRecord::Base
     state :sent, before_enter: Proc.new { self.upload_ended_at = Time.now }
     state :cancelled, before_enter: Proc.new { self.cancelled_at = Time.now }
     
-    after_all_transitions :log_status_change
-    
     event :pay do
       transitions :from => :pending, :to => :paid
     end
@@ -50,10 +48,6 @@ class Order < ActiveRecord::Base
     event :bump do
       transitions :from => [:pending, :paid], :to => :pending
     end
-  end
-  
-  def log_status_change
-    puts "changing from #{aasm.from_state} to #{aasm.to_state} (event: #{aasm.current_event})"
   end
   
   def message_path
