@@ -55,7 +55,7 @@
                     <th class="created_at">Created</th>
                     <th class="bid_per_byte">Bid per Byte (millisatoshis)</th>
                     <th class="message_size">Message Size</th>
-                    <th class="message_digest">Message Digest</th>
+                    <th class="uuid">Order ID</th>
                     <th class="status">Status</th>
                     <th class="upload_started_at">Upload Started</th>
                     <th class="upload_ended_at">Upload Ended</th>
@@ -73,7 +73,7 @@
                     <th class="bid_per_byte">Bid per Byte (millisatoshis)</th>
                     <th class="message">Message</th>
                     <th class="message_size">Message Size</th>
-                    <th class="message_digest">Message Digest</th>
+                    <th class="uuid">Order ID</th>
                     <th class="status">Status</th>
                     <th class="upload_started_at">Upload Started</th>
                     <th class="upload_ended_at">Upload Ended</th>
@@ -86,7 +86,7 @@
 
   <script type="text/javascript">
     $(function() {
-      $.getJSON( "orders?status=paid", function( data ) {
+      $.getJSON( "orders/queued", function( data ) {
         $.each( data, function( key, val ) {
           var upload_started_at = moment(val.upload_started_at);
           var upload_ended_at = moment(val.upload_ended_at);
@@ -94,22 +94,7 @@
                 $('<td>').text(moment(val.created_at).fromNow()),
                 $('<td>').text(val.bid_per_byte),
                 $('<td>').text(val.message_size),
-                $('<td>').text(val.message_digest),
-                $('<td>').text(val.status),
-                $('<td>').text(upload_started_at.isValid() ? upload_started_at.fromNow() : ""),
-                $('<td>').text(upload_ended_at.isValid() ? upload_ended_at.fromNow() : "")
-          ));
-        });
-      });
-      $.getJSON( "orders?status=pending,transmitting,cancelled", function( data ) {
-        $.each( data, function( key, val ) {
-          var upload_started_at = moment(val.upload_started_at);
-          var upload_ended_at = moment(val.upload_ended_at);
-          $("#queued_table").append($('<tr>').append(
-                $('<td>').text(moment(val.created_at).fromNow()),
-                $('<td>').text(val.bid_per_byte),
-                $('<td>').text(val.message_size),
-                $('<td>').text(val.message_digest),
+                $('<td>').text(val.uuid),
                 $('<td>').text(val.status),
                 $('<td>').text(upload_started_at.isValid() ? upload_started_at.fromNow() : ""),
                 $('<td>').text(upload_ended_at.isValid() ? upload_ended_at.fromNow() : "")
@@ -117,16 +102,16 @@
         });
       });
 
-      $.getJSON( "orders?status=sent", function( data ) {
+      $.getJSON( "orders/sent", function( data ) {
         $.each( data, function( key, val ) {
           var upload_started_at = moment(val.upload_started_at);
           var upload_ended_at = moment(val.upload_ended_at);
           $("#sent_table").append($('<tr>').append(
                 $('<td>').text(moment(val.created_at).fromNow()),
                 $('<td>').text(val.bid_per_byte),
-                $('<td>').html('<a href="message/' + val.message_digest + '">download</a>'),
+                $('<td>').html('<a href="message/' + val.uuid + '">download</a>'),
                 $('<td>').text(val.message_size),
-                $('<td>').text(val.message_digest),
+                $('<td>').text(val.uuid),
                 $('<td>').text(val.status),
                 $('<td>').text(upload_started_at.isValid() ? upload_started_at.fromNow() : ""),
                 $('<td>').text(upload_ended_at.isValid() ? upload_ended_at.fromNow() : "")
