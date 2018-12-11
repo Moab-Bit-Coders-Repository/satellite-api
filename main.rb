@@ -89,6 +89,10 @@ post '/order' do
     message_file.write(block)
   end
   message_file.close()
+  if message_size < MIN_MESSAGE_SIZE
+    FileUtils.rm(message_file)
+    halt 400, {:message => "Message upload problem", :errors => ["Message too small. Minimum message size is #{MIN_MESSAGE_SIZE}"]}.to_json
+  end
 
   order.message_size = message_size
   order.message_digest = sha256.to_s
