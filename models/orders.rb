@@ -7,7 +7,7 @@ class Order < ActiveRecord::Base
   include AASM
   before_validation :set_bid_per_byte
   
-  PUBLIC_FIELDS = [:bid, :bid_per_byte, :message_size, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at]
+  PUBLIC_FIELDS = [:uuid, :bid, :bid_per_byte, :message_size, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at]
 
   # FIXME add state machine validations, possibly with dm-is-state_machine
   VALID_STATUSES = [:pending, :paid, :transmitting, :sent, :cancelled]
