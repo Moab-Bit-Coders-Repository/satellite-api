@@ -20,8 +20,12 @@ class MainAppTest < Minitest::Test
     Sinatra::Application
   end
  
+  def place_order
+    post '/order', params={"bid" => DEFAULT_BID, "file" => Rack::Test::UploadedFile.new(TEST_FILE, "image/png")}    
+  end
+ 
   def setup
-    post '/order', params={"bid" => DEFAULT_BID, "file" => Rack::Test::UploadedFile.new(TEST_FILE, "image/png")}
+    place_order
     @order = JSON.parse(last_response.body)
     @order_uuid = @order['lightning_invoice']['metadata']['uuid']
   end  
@@ -30,10 +34,18 @@ class MainAppTest < Minitest::Test
     File.open('response.html', 'w') { |file| file.write(last_response.body) }    
   end
 
-  def test_get_orders
-    get '/orders'
-    write_response
+  def test_get_orders_queued
+    get '/orders/queued'
     assert last_response.ok?
+    r = JSON.parse(last_response.body)
+    assert_equal r.count, 0
+  end
+
+  def test_get_orders_sent
+    get '/orders/sent'
+    assert last_response.ok?
+    r = JSON.parse(last_response.body)
+    assert_equal r.count, 0
   end
 
   def test_order_creation

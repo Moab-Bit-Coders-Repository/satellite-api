@@ -74,20 +74,33 @@ The `auth_token` may be provided as a parameter in the DELETE body as above or m
 curl -v -X DELETE -H "X-Auth-Token: 5248b13a722cd9b2e17ed3a2da8f7ac6bd9a8fe7130357615e074596e3d5872f" $IONOSPHERE//order/409348bc-6af0-4999-b715-4136753979df
 ```
 
-### GET /orders  ###
+### GET /orders/queued  ###
 
-Retrieve a list of paid, but unsent orders. In development mode, a broader set of orders can be retrieved using the query parameter `status` to provide a filter in the form of a comma-separated list of order statuses. The valid order statuses are: `pending`, `paid`, `transmitting`, `sent`, and `cancelled`.
+Retrieve a list of paid, but unsent orders. Both pending orders and the order currently being transmitted are returned. Optionally, accepts a parameter specifying how many queued order to return.
 
 ```bash
-curl $IONOSPHERE/orders
+curl $IONOSPHERE/orders/queued
 ```
 
 ```bash
-export RACK_ENV=development
-curl $IONOSPHERE/orders?status=pending,transmitting,cancelled
+curl $IONOSPHERE/orders/queued?limit=18
 ```
 
-The response is a JSON array of records (one for each queued message). The revealed fields for each record include: `bid`, `message_size`, `message_digest`, `status`, `created_at`, `upload_started_at`, and `upload_ended_at`.
+The response is a JSON array of records (one for each queued message). The revealed fields for each record include: `uuid`, `bid`, `bid_per_byte`, `message_size`, `message_digest`, `status`, `created_at`, `upload_started_at`, and `upload_ended_at`.
+
+### GET /orders/sent  ###
+
+Retrieves a list of up to 20 sent orders in reverse chronological order. Optionally, accepts the parameter `before` (a timestamp in ISO 8601 format) specifying that only orders before the given time are to be returned.
+
+```bash
+curl $IONOSPHERE/orders/sent
+```
+
+```bash
+curl $IONOSPHERE/orders/sent?limit=18
+```
+
+The response is a JSON array of records (one for each queued message). The revealed fields for each record include: `uuid`, `bid`, `bid_per_byte`, `message_size`, `message_digest`, `status`, `created_at`, `upload_started_at`, and `upload_ended_at`.
 
 ## Debugging ##
 

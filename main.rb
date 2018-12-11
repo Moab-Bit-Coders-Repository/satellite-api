@@ -3,6 +3,7 @@ require "sinatra/activerecord"
 require "faraday"
 require 'securerandom'
 require 'openssl'
+require 'time'
 
 require_relative 'constants'
 require_relative './models/init'
@@ -27,13 +28,31 @@ configure :development do
   end
 end
 
-# GET /orders
+# GET /orders/queued
 # params: 
-#   status - a comma-separated list of order statuses to return
-get '/orders' do
-  param :status, String, required: false, default: "paid"
-  statuses = (params[:status].split(',').map(&:to_sym) & Order::VALID_STATUSES)
-  Order.where(status: statuses).select(Order::PUBLIC_FIELDS).order(bid_per_byte: :desc).to_json(:only => Order::PUBLIC_FIELDS)
+#   limit - return top limit orders (optional)
+# returns:
+#   array of JSON orders sorted by bid-per-byte descending
+get '/orders/queued' do
+  param :limit, Integer, default: PAGE_SIZE, max: MAX_QUEUED_ORDERS_REQUEST, message: "can't display more than top #{MAX_QUEUED_ORDERS_REQUEST} orders"
+  Order.where(status: [:paid, :upload_started_at])
+       .select(Order::PUBLIC_FIELDS)
+       .order(bid_per_byte: :desc)
+       .limit(params[:limit]).to_json(:only => Order::PUBLIC_FIELDS)
+end
+
+# GET /orders/sent
+# params: 
+#   before - return the previous PAGE_SIZE orders sent before the given time (time should be sent as in ISO 8601 format and defaults to now)
+# returns:
+#   array of JSON orders sorted in reverse chronological order
+get '/orders/sent' do
+  param :before, String, required: false, default: lambda { Time.now.utc.iso8601 }
+  before = DateTime.iso8601(params[:before])
+  Order.where(status: :sent).where("created_at < ?", params[:before])
+       .select(Order::PUBLIC_FIELDS)
+       .order(upload_ended_at: :desc)
+       .limit(PAGE_SIZE).to_json(:only => Order::PUBLIC_FIELDS)
 end
 
 get '/message/:message_hash' do
