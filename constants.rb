@@ -14,7 +14,7 @@ CALLBACK_URI_ROOT = ENV['CALLBACK_URI_ROOT'] || "http://localhost:4567"
 CHARGE_API_TOKEN = ENV['CHARGE_API_TOKEN'] || 'mySecretToken'
 CHARGE_ROOT = ENV['CHARGE_ROOT'] || "http://api-token:#{CHARGE_API_TOKEN}@localhost:9112"
 
-MIN_PER_BYTE_BID = ENV['MIN_PER_BYTE_BID'] || 1 # minimum price per byte in millisatoshis
+MIN_PER_BYTE_BID = ENV['MIN_PER_BYTE_BID'] || 50 # minimum price per byte in millisatoshis
 MAX_MESSAGE_SIZE = 1 * MEGA_BYTE
 
 LN_INVOICE_EXPIRY = 60 * 10 # ten minutes
