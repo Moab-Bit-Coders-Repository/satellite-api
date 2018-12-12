@@ -1,5 +1,6 @@
 require 'aasm'
 require 'redis'
+require 'json'
 require_relative '../constants'
 require_relative './invoices'
 require_relative '../helpers/digest_helpers'
@@ -52,11 +53,7 @@ class Order < ActiveRecord::Base
   end
   
   def notify_transmissions_channel
-    @@redis 'transmissions', self.as_json
-  end
-  
-  def as_json
-    self.to_json(:only => PUBLIC_FIELDS)
+    @@redis.publish 'transmissions', self.to_json(:only => Order::PUBLIC_FIELDS)
   end
   
   def message_path
