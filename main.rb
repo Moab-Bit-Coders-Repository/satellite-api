@@ -49,7 +49,7 @@ end
 get '/orders/sent' do
   param :before, String, required: false, default: lambda { Time.now.utc.iso8601 }
   before = DateTime.iso8601(params[:before])
-  Order.where(status: :sent).where("created_at < ?", params[:before])
+  Order.where(status: :sent).where("created_at < ?", before)
        .select(Order::PUBLIC_FIELDS)
        .order(upload_ended_at: :desc)
        .limit(PAGE_SIZE).to_json(:only => Order::PUBLIC_FIELDS)
@@ -63,7 +63,7 @@ end
 get '/orders/pending' do
   param :before, String, required: false, default: lambda { Time.now.utc.iso8601 }
   before = DateTime.iso8601(params[:before])
-  Order.where(status: :pending).where("created_at < ?", params[:before])
+  Order.where(status: :pending).where("created_at < ?", before)
        .select(Order::PUBLIC_FIELDS)
        .order(upload_ended_at: :desc)
        .limit(PAGE_SIZE).to_json(:only => Order::PUBLIC_FIELDS)
