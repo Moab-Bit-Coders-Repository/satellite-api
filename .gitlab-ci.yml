@@ -30,6 +30,6 @@ deploy_ionosphere:
     - tags@satellite/ionosphere
   script:
     - (cd terraform && terraform init)
-    - (cd terraform && terraform apply \
-      -var "ionosphere_docker=us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA"
-      -input=false -auto-approve)
+    - (cd terraform && terraform apply
+        -var "ionosphere_docker=us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA"
+        -input=false -auto-approve)
