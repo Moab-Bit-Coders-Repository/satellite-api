@@ -35,7 +35,7 @@ end
 #   array of JSON orders sorted by bid-per-byte descending
 get '/orders/queued' do
   param :limit, Integer, default: PAGE_SIZE, max: MAX_QUEUED_ORDERS_REQUEST, message: "can't display more than top #{MAX_QUEUED_ORDERS_REQUEST} orders"
-  Order.where(status: [:paid, :upload_started_at])
+  Order.where(status: [:paid, :transmitting])
        .select(Order::PUBLIC_FIELDS)
        .order(bid_per_byte: :desc)
        .limit(params[:limit]).to_json(:only => Order::PUBLIC_FIELDS)
@@ -160,7 +160,7 @@ post '/callback/:lid/:charged_auth_token' do
   
   Order.transaction do
     invoice.update(:paid_at => Time.now)
-    invoice.order.update(:status => :paid) if invoice.order.all_paid?    
+    invoice.order.pay! if invoice.order.invoices_all_paid?    
   end
   
   {:message => "invoice #{invoice.lid} paid"}.to_json

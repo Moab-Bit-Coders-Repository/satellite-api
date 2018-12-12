@@ -55,7 +55,7 @@ class Order < ActiveRecord::Base
   end
   
   # have all invoices been paid?
-  def all_paid?
+  def invoices_all_paid?
     self.invoices(:fields => [:paid_at]).map {|i| not i.paid_at.nil?}.reduce(:&)
   end
   
