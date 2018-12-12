@@ -9,6 +9,7 @@ gem 'daemons'
 gem 'puma'
 gem 'rake'
 gem 'aasm'
+gem 'redis'
 
 group :test do
   gem 'minitest'

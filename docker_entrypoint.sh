@@ -6,6 +6,10 @@ if [ ! -f /data/ionosphere/ionosphere_production.sqlite3 ]; then
         bundle exec rake db:schema:load
 fi
 
+
+echo "starting transmitter_control"
+bundle exec ruby daemons/transmitter.rb &
+
 bundle exec rackup --host 0.0.0.0
 
 # shutdown the entire process when any of the background jobs exits (even if successfully)

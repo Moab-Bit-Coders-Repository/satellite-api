@@ -13,6 +13,7 @@ loop do
     end
   end  
   
+  sendable_order.transmit!
   if TRANSMIT_RATE_LIMIT
     sleep Float(sendable_order.message_size) / TRANSMIT_RATE_LIMIT
   end

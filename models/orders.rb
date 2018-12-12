@@ -1,4 +1,5 @@
 require 'aasm'
+require 'redis'
 require_relative '../constants'
 require_relative './invoices'
 require_relative '../helpers/digest_helpers'
@@ -8,6 +9,9 @@ class Order < ActiveRecord::Base
   before_validation :set_bid_per_byte
   
   PUBLIC_FIELDS = [:uuid, :bid, :bid_per_byte, :message_size, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at]
+
+  @@redis = Redis.new
+  
 
   enum status: [:pending, :paid, :transmitting, :sent, :cancelled]
   validates :bid, presence: true, numericality: { only_integer: true }
@@ -30,11 +34,11 @@ class Order < ActiveRecord::Base
       transitions :from => :pending, :to => :paid
     end
 
-    event :transmit do
+    event :transmit, :after => :notify_transmissions_channel do
       transitions :from => :paid, :to => :transmitting
     end
 
-    event :end_transmission do
+    event :end_transmission, :after => :notify_transmissions_channel do
       transitions :from => :transmitting, :to => :sent
     end
 
@@ -45,6 +49,14 @@ class Order < ActiveRecord::Base
     event :bump do
       transitions :from => [:pending, :paid], :to => :pending
     end
+  end
+  
+  def notify_transmissions_channel
+    @@redis 'transmissions', self.as_json
+  end
+  
+  def as_json
+    self.to_json(:only => PUBLIC_FIELDS)
   end
   
   def message_path
