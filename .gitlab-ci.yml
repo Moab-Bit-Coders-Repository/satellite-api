@@ -17,7 +17,7 @@ before_script:
 
 build_ionosphere:
   only:
-    - master
+    - master@satellite/ionosphere
   stage: build
   script:
     - docker build -f Dockerfile -t us.gcr.io/blockstream-store/ionosphere:latest -t us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA .

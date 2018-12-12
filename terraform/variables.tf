@@ -31,5 +31,5 @@ variable "charge_docker" {
 
 variable "ionosphere_docker" {
   type    = "string"
-  default = "us.gcr.io/blockstream-store/ionosphere@sha256:be361f13cd8d681b2927670ff673e7bf70060dca73d856d8594914e23f9a601d"
+  default = "us.gcr.io/blockstream-store/ionosphere@sha256:32ad7042d8e457066eb0bb88f8df5f16ab97c0791c6ec8fdc5d3d49182f05ecb"
 }

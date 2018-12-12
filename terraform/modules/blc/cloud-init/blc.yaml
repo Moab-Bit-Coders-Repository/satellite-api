@@ -56,7 +56,8 @@ write_files:
         bitcoin-rpcuser=${rpcuser}
         bitcoin-rpcpassword=${rpcpass}
         bitcoin-rpcport=${rpcport}
-        bind-addr=127.0.0.1:${lightning_port}
+        announce-addr=${announce_addr}
+        bind-addr=0.0.0.0
 
   - path: /etc/systemd/system/nginx.service
     permissions: 0644
@@ -126,7 +127,7 @@ write_files:
         Environment=HOME=/home/bs
         ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
         ExecStartPre=/usr/bin/docker pull ${lightning_docker}
-        ExecStartPre=/sbin/iptables -A INPUT -m tcp -p tcp --dport ${lightning_port} -j ACCEPT
+        ExecStartPre=/sbin/iptables -A INPUT -p tcp --dport ${lightning_port} -j ACCEPT
         ExecStart=/usr/bin/docker run \
             --network=host \
             --pid=host \
@@ -139,7 +140,7 @@ write_files:
         ExecStop=/usr/bin/sleep 10
         ExecStop=/usr/bin/docker stop lightning
         ExecStopPost=/usr/bin/docker rm lightning
-        ExecStopPost=/sbin/iptables -D INPUT -m tcp -p tcp --dport ${lightning_port} -j ACCEPT
+        ExecStopPost=/sbin/iptables -D INPUT -p tcp --dport ${lightning_port} -j ACCEPT
 
   - path: /etc/systemd/system/ionosphere.service
     permissions: 0644
