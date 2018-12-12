@@ -13,7 +13,7 @@ provider "google" {
 }
 
 data "google_compute_image" "ionosphere" {
-  family  = "btc-mainnet-testnet"
+  family  = "blc-ionosphere"
   project = "blockstream-store"
 }
 
