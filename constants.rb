@@ -14,14 +14,14 @@ CALLBACK_URI_ROOT = ENV['CALLBACK_URI_ROOT'] || "http://localhost:4567"
 CHARGE_API_TOKEN = ENV['CHARGE_API_TOKEN'] || 'mySecretToken'
 CHARGE_ROOT = ENV['CHARGE_ROOT'] || "http://api-token:#{CHARGE_API_TOKEN}@localhost:9112"
 
-MIN_PER_BYTE_BID = ENV['MIN_PER_BYTE_BID'] || 50 # minimum price per byte in millisatoshis
-MIN_MESSAGE_SIZE = ENV['MIN_MESSAGE_SIZE'] || KILO_BYTE
+MIN_PER_BYTE_BID = Integer(ENV['MIN_PER_BYTE_BID']) || 50 # minimum price per byte in millisatoshis
+MIN_MESSAGE_SIZE = Integer(ENV['MIN_MESSAGE_SIZE']) || KILO_BYTE
 MAX_MESSAGE_SIZE = 1 * MEGA_BYTE
 
 LN_INVOICE_EXPIRY = 60 * 10 # ten minutes
 LN_INVOICE_DESCRIPTION = (ENV['RACK_ENV'] == 'production') ? "Blockstream Satellite Transmission" : "BSS Test"
 MAX_LIGHTNING_INVOICE_SIZE = 1024
 
-TRANSMIT_RATE_LIMIT = ENV['TRANSMIT_RATE_LIMIT'] # bytes per second
+TRANSMIT_RATE_LIMIT = Integer(ENV['TRANSMIT_RATE_LIMIT']) # bytes per second
 PAGE_SIZE = 20
 MAX_QUEUED_ORDERS_REQUEST = 100
