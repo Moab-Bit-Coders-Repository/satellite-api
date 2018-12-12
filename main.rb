@@ -55,6 +55,20 @@ get '/orders/sent' do
        .limit(PAGE_SIZE).to_json(:only => Order::PUBLIC_FIELDS)
 end
 
+# GET /orders/pending
+# params: 
+#   before - return the previous PAGE_SIZE orders sent before the given time (time should be sent as in ISO 8601 format and defaults to now)
+# returns:
+#   array of JSON orders sorted in reverse chronological order
+get '/orders/pending' do
+  param :before, String, required: false, default: lambda { Time.now.utc.iso8601 }
+  before = DateTime.iso8601(params[:before])
+  Order.where(status: :pending).where("created_at < ?", params[:before])
+       .select(Order::PUBLIC_FIELDS)
+       .order(upload_ended_at: :desc)
+       .limit(PAGE_SIZE).to_json(:only => Order::PUBLIC_FIELDS)
+end
+
 get '/message/:message_hash' do
   send_file File.join(SENT_MESSAGE_STORE_PATH, params[:message_hash]), :disposition => 'attachment'
 end
