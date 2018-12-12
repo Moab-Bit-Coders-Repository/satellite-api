@@ -18,8 +18,5 @@ loop do
   end
   sendable_order.send!
 
-  # For retrieval over the web
-  FileUtils.ln_s(sendable_order.message_path, File.join(SENT_MESSAGE_STORE_PATH, sendable_order.message_digest))
-
   # TODO transmit the message to the satellite uplink stations
 end

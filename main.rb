@@ -69,8 +69,9 @@ get '/orders/pending' do
        .limit(PAGE_SIZE).to_json(:only => Order::PUBLIC_FIELDS)
 end
 
-get '/message/:message_hash' do
-  send_file File.join(SENT_MESSAGE_STORE_PATH, params[:message_hash]), :disposition => 'attachment'
+get '/orders/:uuid/message' do
+  uuid_path_component = sanitize_uuid_param(params[:uuid])
+  send_file File.join(MESSAGE_STORE_PATH, uuid_path_component), :disposition => 'attachment'
 end
 
 # POST /order

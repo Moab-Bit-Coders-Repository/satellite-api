@@ -7,7 +7,6 @@ yaml_path = File.join(File.expand_path(File.dirname(__FILE__)), 'config', 'datab
 conf = YAML.load_file(yaml_path)
 DB_ROOT = File.dirname(conf[ENV['RACK_ENV']]['database'])
 MESSAGE_STORE_PATH = File.join(DB_ROOT, 'messages')
-SENT_MESSAGE_STORE_PATH = File.join(MESSAGE_STORE_PATH, 'sent')
 
 CALLBACK_URI_ROOT = ENV['CALLBACK_URI_ROOT'] || "http://localhost:4567"
 
