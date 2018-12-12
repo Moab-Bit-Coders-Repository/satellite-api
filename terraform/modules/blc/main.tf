@@ -25,6 +25,7 @@ resource "google_compute_instance_template" "blc" {
   name_prefix  = "${var.name}-template-"
   description  = "This template is used to create ${var.name} instances."
   machine_type = "${var.instance_type}"
+  region       = "${var.region}"
 
   labels {
     type = "lightning-app"
