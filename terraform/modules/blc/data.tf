@@ -2,6 +2,11 @@ data "google_compute_network" "blc" {
   name = "default"
 }
 
+data "google_compute_image" "blc" {
+  family  = "blc-ionosphere"
+  project = "${var.project}"
+}
+
 data "template_file" "blc" {
   template = "${file("${path.module}/cloud-init/blc.yaml")}"
 

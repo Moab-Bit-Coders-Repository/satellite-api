@@ -8,6 +8,18 @@ resource "google_compute_region_instance_group_manager" "blc" {
   target_size        = 1
 }
 
+resource "google_compute_disk" "blc" {
+  name  = "ionosphere-data-prod"
+  type  = "pd-standard"
+  image = "${data.google_compute_image.blc.self_link}"
+  zone  = "${var.zone}"
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = ["image"]
+  }
+}
+
 # Instance template
 resource "google_compute_instance_template" "blc" {
   name_prefix  = "${var.name}-template-"
@@ -32,10 +44,9 @@ resource "google_compute_instance_template" "blc" {
   }
 
   disk {
-    source_image = "${var.data_image}"
-    disk_type    = "pd-ssd"
-    auto_delete  = false
-    device_name  = "data"
+    source      = "${google_compute_disk.blc.name}"
+    auto_delete = false
+    device_name = "data"
   }
 
   network_interface {
@@ -43,7 +54,7 @@ resource "google_compute_instance_template" "blc" {
 
     access_config {
       nat_ip = "${google_compute_address.ionosphere.address}"
-     }
+    }
   }
 
   metadata {

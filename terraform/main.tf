@@ -12,11 +12,6 @@ provider "google" {
   project = "${var.project}"
 }
 
-data "google_compute_image" "ionosphere" {
-  family  = "blc-ionosphere"
-  project = "blockstream-store"
-}
-
 module "blc" {
   source = "modules/blc"
 
@@ -28,7 +23,6 @@ module "blc" {
   charge_docker     = "${var.charge_docker}"
   ionosphere_docker = "${var.ionosphere_docker}"
   net               = "testnet"
-  data_image        = "${data.google_compute_image.ionosphere.self_link}"
 
   # CI vars
   region        = "us-west1"

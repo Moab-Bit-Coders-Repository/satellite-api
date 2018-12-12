@@ -44,10 +44,6 @@ variable "instance_type" {
   type = "string"
 }
 
-variable "data_image" {
-  type = "string"
-}
-
 variable "net" {
   type = "string"
 }
