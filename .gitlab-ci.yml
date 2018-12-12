@@ -31,7 +31,8 @@ deploy_ionosphere:
   script:
     - (cd terraform && terraform init)
     - (cd terraform && terraform destroy
-        -target module.blc.google_compute_region_instance_group_manager.blc)
+        -target module.blc.google_compute_region_instance_group_manager.blc
+        -auto-approve)
     - (cd terraform && terraform apply
         -var "ionosphere_docker=us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA"
         -input=false -auto-approve)
