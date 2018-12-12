@@ -1,10 +1,10 @@
 # Instance group
-resource "google_compute_region_instance_group_manager" "blc" {
+resource "google_compute_instance_group_manager" "blc" {
   name = "${var.name}-ig"
 
   base_instance_name = "${var.name}-ig-${count.index}"
   instance_template  = "${google_compute_instance_template.blc.self_link}"
-  region             = "${var.region}"
+  zone               = "${var.zone}"
   target_size        = 1
 }
 

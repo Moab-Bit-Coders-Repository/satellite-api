@@ -34,7 +34,7 @@ resource "google_compute_backend_service" "blc" {
   timeout_sec = 15
 
   backend {
-    group = "${google_compute_region_instance_group_manager.blc.instance_group}"
+    group = "${google_compute_instance_group_manager.blc.instance_group}"
   }
 
   health_checks = ["${google_compute_health_check.blc.self_link}"]
