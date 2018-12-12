@@ -41,7 +41,9 @@ resource "google_compute_instance_template" "blc" {
   network_interface {
     network = "${data.google_compute_network.blc.self_link}"
 
-    access_config {}
+    access_config {
+      nat_ip = "${google_compute_address.ionosphere.address}"
+     }
   }
 
   metadata {
