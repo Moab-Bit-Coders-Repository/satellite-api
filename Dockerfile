@@ -9,6 +9,7 @@ RUN addgroup -g 1000 ionosphere \
 RUN apk update && \
     apk upgrade && \
     apk --update add $RUBY_PACKAGES $RUBY_DEPS && \
+    apk --update add nodejs nodejs-npm redis && \
     echo 'gem: --no-document' > /etc/gemrc
 
 RUN mkdir /app && \
@@ -22,11 +23,14 @@ WORKDIR /app
 ENV BUILD_PACKAGES sudo build-base ruby-dev libc-dev linux-headers openssl-dev
 RUN apk --update add --virtual build_deps $BUILD_PACKAGES && \
     bundle install && \
+    cd sse && npm install && cd .. &&
     apk del build_deps && \
     rm -rf /var/cache/apk/*
 
 COPY . /app
 RUN chown -R ionosphere:ionosphere /app
 USER ionosphere
+
+EXPOSE 9292 4500
 
 CMD ./docker_entrypoint.sh
