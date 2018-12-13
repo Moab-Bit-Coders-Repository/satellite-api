@@ -9,9 +9,6 @@ class Order < ActiveRecord::Base
   
   PUBLIC_FIELDS = [:uuid, :bid, :bid_per_byte, :message_size, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at]
 
-  # FIXME add state machine validations, possibly with dm-is-state_machine
-  VALID_STATUSES = [:pending, :paid, :transmitting, :sent, :cancelled]
-  
   enum status: [:pending, :paid, :transmitting, :sent, :cancelled]
   validates :bid, presence: true, numericality: { only_integer: true }
   validates :message_size, presence: true, numericality: { only_integer: true }
@@ -33,7 +30,7 @@ class Order < ActiveRecord::Base
       transitions :from => :pending, :to => :paid
     end
 
-    event :start_transmission do
+    event :transmit do
       transitions :from => :paid, :to => :transmitting
     end
 
