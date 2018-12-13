@@ -43,6 +43,9 @@
       <a class="nav-link" id="pills-queued-tab" data-toggle="pill" href="#pills-queued" role="tab" aria-controls="pills-queued" aria-selected="true">Queued</a>
     </li>
     <li class="nav-item">
+      <a class="nav-link" id="pills-pending-tab" data-toggle="pill" href="#pills-pending" role="tab" aria-controls="pills-pending" aria-selected="false">Pending</a>
+    </li>
+    <li class="nav-item">
       <a class="nav-link" id="pills-sent-tab" data-toggle="pill" href="#pills-sent" role="tab" aria-controls="pills-sent" aria-selected="false">Sent</a>
     </li>
   </ul>
@@ -64,7 +67,24 @@
         </table>
       </div>
     </div>
-    <div class="tab-pane fade active" id="pills-sent" role="tabpanel" aria-labelledby="pills-sent-tab">
+    <div class="tab-pane fade" id="pills-pending" role="tabpanel" aria-labelledby="pills-pending-tab">
+      <div class="panel panel-default">
+        <table id="pending_table">
+            <thead>
+                <tr>
+                    <th class="created_at">Created</th>
+                    <th class="bid_per_byte">Bid per Byte (millisatoshis)</th>
+                    <th class="message_size">Message Size</th>
+                    <th class="uuid">Order ID</th>
+                    <th class="status">Status</th>
+                    <th class="upload_started_at">Upload Started</th>
+                    <th class="upload_ended_at">Upload Ended</th>
+                </tr>
+            </thead>
+        </table>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="pills-sent" role="tabpanel" aria-labelledby="pills-sent-tab">
       <div class="panel panel-default">
         <table id="sent_table">
             <thead>
@@ -76,7 +96,6 @@
                     <th class="uuid">Order ID</th>
                     <th class="status">Status</th>
                     <th class="upload_started_at">Upload Started</th>
-                    <th class="upload_ended_at">Upload Ended</th>
                 </tr>
             </thead>
         </table>
@@ -91,6 +110,22 @@
           var upload_started_at = moment(val.upload_started_at);
           var upload_ended_at = moment(val.upload_ended_at);
           $("#queued_table").append($('<tr>').append(
+                $('<td>').text(moment(val.created_at).fromNow()),
+                $('<td>').text(val.bid_per_byte),
+                $('<td>').text(val.message_size),
+                $('<td>').text(val.uuid),
+                $('<td>').text(val.status),
+                $('<td>').text(upload_started_at.isValid() ? upload_started_at.fromNow() : ""),
+                $('<td>').text(upload_ended_at.isValid() ? upload_ended_at.fromNow() : "")
+          ));
+        });
+      });
+
+      $.getJSON( "orders/pending", function( data ) {
+        $.each( data, function( key, val ) {
+          var upload_started_at = moment(val.upload_started_at);
+          var upload_ended_at = moment(val.upload_ended_at);
+          $("#pending_table").append($('<tr>').append(
                 $('<td>').text(moment(val.created_at).fromNow()),
                 $('<td>').text(val.bid_per_byte),
                 $('<td>').text(val.message_size),
