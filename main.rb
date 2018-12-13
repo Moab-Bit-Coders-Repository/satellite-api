@@ -187,9 +187,13 @@ post '/callback/:lid/:charged_auth_token' do
   {:message => "invoice #{invoice.lid} paid"}.to_json
 end
 
-# subscribe to SSE channel
+# subscribe to one or more SSE channels
+# params: 
+#   channels - comma-separated list of channels to subscribe to
+# returns:
+#   SSE event stream
 # available channels:
-# transmissions - an event is pushed to this channel when each message transmission begins and ends
-get '/subscribe/:channel' do
-  redirect "http://#{request.host}:4500/stream"
+#   transmissions - an event is pushed to this channel when each message transmission begins and ends
+get '/subscribe/:channels' do
+  redirect "http://#{request.host}:4500/stream?channels=#{params[:channels]}"
 end
