@@ -72,5 +72,9 @@ class Order < ActiveRecord::Base
   def set_bid_per_byte
     self.bid_per_byte = self.computed_bid_per_byte
   end
+  
+  def as_sanitized_json
+    self.to_json(:only => Order::PUBLIC_FIELDS)
+  end
 
 end

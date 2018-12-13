@@ -152,6 +152,13 @@ post '/order/:uuid/bump' do
   {:auth_token => order.user_auth_token, :uuid => order.uuid, :lightning_invoice => JSON.parse(invoice.invoice)}.to_json
 end
 
+get '/order/:uuid' do
+  param :uuid, String, required: true
+  param :auth_token, String, required: true, default: lambda { env['HTTP_X_AUTH_TOKEN'] },
+        message: "auth_token must be provided either in the DELETE body or in an X-Auth-Token header"
+  order.as_sanitized_json
+end
+
 delete '/order/:uuid' do
   param :uuid, String, required: true
   param :auth_token, String, required: true, default: lambda { env['HTTP_X_AUTH_TOKEN'] },

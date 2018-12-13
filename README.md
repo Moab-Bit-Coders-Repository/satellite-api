@@ -60,6 +60,14 @@ Response object is in the same format as for `POST /order`.
 
 As shown below for DELETE, the `auth_token` may alternatively be provided using the `X-Auth-Token` HTTP header.
 
+### GET /order/:uuid ###
+
+Retrieve an order by UUID. Must provide the corresponding auth token to prove that it is yours.
+
+```bash
+curl -v -H "X-Auth-Token: 5248b13a722cd9b2e17ed3a2da8f7ac6bd9a8fe7130357615e074596e3d5872f" $IONOSPHERE//order/409348bc-6af0-4999-b715-4136753979df
+```
+
 ### DELETE /order/:uuid ###
 
 To cancel an order, issue an HTTP DELETE request to the API endpoint `/order/:uuid/` providing the UUID of the order. An `auth_token` must also be provided. For example, to cancel the order above, issue a request like this:

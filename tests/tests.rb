@@ -51,8 +51,17 @@ class MainAppTest < Minitest::Test
     assert_equal r.count, 0
   end
 
+  def test_get_order
+    place_order
+    assert last_response.ok?
+    r = JSON.parse(last_response.body)
+    header 'X-Auth-Token', r['auth_token']
+    get %Q(/order/#{r['uuid']})
+    assert last_response.ok?
+  end
+  
   def test_order_creation
-    post '/order', params={"bid" => DEFAULT_BID, "file" => Rack::Test::UploadedFile.new(TEST_FILE, "image/png")}
+    place_order
     assert last_response.ok?
     r = JSON.parse(last_response.body)
     refute_nil r['auth_token']
