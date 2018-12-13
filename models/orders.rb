@@ -11,7 +11,7 @@ class Order < ActiveRecord::Base
   
   PUBLIC_FIELDS = [:uuid, :bid, :bid_per_byte, :message_size, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at]
 
-  @@redis = Redis.new
+  @@redis = Redis.new(url: REDIS_URI)
   
 
   enum status: [:pending, :paid, :transmitting, :sent, :cancelled]
