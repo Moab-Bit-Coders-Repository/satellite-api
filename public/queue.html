@@ -144,7 +144,7 @@
           $("#sent_table").append($('<tr>').append(
                 $('<td>').text(moment(val.created_at).fromNow()),
                 $('<td>').text(val.bid_per_byte),
-                $('<td>').html('<a href="message/' + val.uuid + '">download</a>'),
+                $('<td>').html('<a href="order/' + val.uuid + '/sent_message">download</a>'),
                 $('<td>').text(val.message_size),
                 $('<td>').text(val.uuid),
                 $('<td>').text(val.status),
