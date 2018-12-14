@@ -8,7 +8,6 @@ fi
 
 bundle exec rackup --host 0.0.0.0
 
-
 # shutdown the entire process when any of the background jobs exits (even if successfully)
 wait -n
 kill -TERM $$

@@ -103,7 +103,6 @@ write_files:
             --network=host \
             --pid=host \
             --name=bitcoin \
-            --tmpfs /tmp/ \
             -v /home/bs/bitcoin.conf:/root/.bitcoin/bitcoin.conf:ro \
             -v /mnt/disks/data/testnet:/root/.bitcoin:rw \
             "${bitcoin_docker}" ${bitcoin_cmd}
@@ -132,7 +131,6 @@ write_files:
             --network=host \
             --pid=host \
             --name=lightning \
-            --tmpfs /tmp/ \
             -v /home/bs/lightning.conf:/root/.lightning/lightning.conf:ro \
             -v /mnt/disks/data/lightning:/root/.lightning:rw \
             "${lightning_docker}" ${lightning_cmd}
@@ -169,7 +167,6 @@ write_files:
             --network=host \
             --pid=host \
             --name=ionosphere \
-            --tmpfs /tmp/ \
             -v /mnt/disks/data/ionosphere:/data \
             -e "RACK_ENV=production" \
             -e "CHARGE_ROOT=http://api-token:${rpcpass}@localhost:9112" \
@@ -178,6 +175,33 @@ write_files:
         ExecStop=/usr/bin/docker stop ionosphere
         ExecStopPost=/usr/bin/docker rm ionosphere
         ExecStopPost=/sbin/iptables -D INPUT -p tcp -s localhost --dport 9292 -j ACCEPT
+
+  - path: /etc/systemd/system/ionosphere-tx.service
+    permissions: 0644
+    owner: root
+    content: |
+        [Unit]
+        Description=Ionosphere Transmitter daemon
+        Wants=gcr-online.target
+        After=ionosphere.service
+
+        [Service]
+        Restart=always
+        RestartSec=3
+        Environment=HOME=/home/bs
+        ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+        ExecStart=/usr/bin/docker run \
+            --network=host \
+            --pid=host \
+            --name=ionosphere \
+            -v /mnt/disks/data/ionosphere:/data \
+            -e "RACK_ENV=production" \
+            -e "CHARGE_ROOT=http://api-token:${rpcpass}@localhost:9112" \
+            -e "CALLBACK_URI_ROOT=http://localhost:9292" \
+            "${ionosphere_docker}" ./docker_entrypoint_transmitter.sh
+        ExecStop=/usr/bin/docker stop ionosphere
+        ExecStopPost=/usr/bin/docker rm ionosphere
+
 
   - path: /etc/systemd/system/charge.service
     permissions: 0644
@@ -199,7 +223,6 @@ write_files:
             --network=host \
             --pid=host \
             --name=charge \
-            --tmpfs /tmp/ \
             -v /mnt/disks/data/lightning:/etc/lightning:ro \
             -v /mnt/disks/data/charge:/data:rw \
             -e "API_TOKEN=${rpcpass}" \
