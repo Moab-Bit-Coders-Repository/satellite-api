@@ -68,6 +68,14 @@ Retrieve an order by UUID. Must provide the corresponding auth token to prove th
 curl -v -H "X-Auth-Token: 5248b13a722cd9b2e17ed3a2da8f7ac6bd9a8fe7130357615e074596e3d5872f" $IONOSPHERE//order/409348bc-6af0-4999-b715-4136753979df
 ```
 
+### GET /order/:uuid/sent_message ###
+
+Given an order UUID, retrieve a sent message. No authorization required.
+
+```bash
+curl -v $IONOSPHERE//order/409348bc-6af0-4999-b715-4136753979df/sent_message
+```
+
 ### DELETE /order/:uuid ###
 
 To cancel an order, issue an HTTP DELETE request to the API endpoint `/order/:uuid/` providing the UUID of the order. An `auth_token` must also be provided. For example, to cancel the order above, issue a request like this:
