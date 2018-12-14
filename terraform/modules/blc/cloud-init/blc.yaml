@@ -189,15 +189,12 @@ write_files:
         Restart=always
         RestartSec=3
         Environment=HOME=/home/bs
-        ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
         ExecStart=/usr/bin/docker run \
             --network=host \
             --pid=host \
             --name=ionosphere-tx \
             -v /mnt/disks/data/ionosphere:/data \
             -e "RACK_ENV=production" \
-            -e "CHARGE_ROOT=http://api-token:${rpcpass}@localhost:9112" \
-            -e "CALLBACK_URI_ROOT=http://localhost:9292" \
             "${ionosphere_docker}" ./docker_entrypoint_transmitter.sh
         ExecStop=/usr/bin/docker stop ionosphere-tx
         ExecStopPost=/usr/bin/docker rm ionosphere-tx
@@ -239,6 +236,8 @@ runcmd:
   - systemctl enable lightning.service
   - systemctl start ionosphere.service
   - systemctl enable ionosphere.service
+  - systemctl start ionosphere-tx.service
+  - systemctl enable ionosphere-tx.service
   - systemctl start charge.service
   - systemctl enable charge.service
   - systemctl start nginx.service
