@@ -24,14 +24,19 @@ class MainAppTest < Minitest::Test
   end
  
   def place_order
-    post '/order', params={"bid" => DEFAULT_BID, "file" => Rack::Test::UploadedFile.new(TEST_FILE, "image/png")}    
+    post '/order', params={"bid" => DEFAULT_BID, "file" => Rack::Test::UploadedFile.new(TEST_FILE, "image/png")}
+    r = JSON.parse(last_response.body)
+    @order = Order.find_by_uuid(r['uuid'])
   end
  
   def setup
     place_order
-    @order = JSON.parse(last_response.body)
-    @order_uuid = @order['lightning_invoice']['metadata']['uuid']
-  end  
+  end
+  
+  def pay_invoice(invoice)
+    post "/callback/#{invoice.lid}/#{invoice.charged_auth_token}"
+    assert last_response.ok?
+  end
   
   def write_response
     File.open('response.html', 'w') { |file| file.write(last_response.body) }    
@@ -41,14 +46,19 @@ class MainAppTest < Minitest::Test
     get '/orders/queued'
     assert last_response.ok?
     r = JSON.parse(last_response.body)
-    assert_equal r.count, 0
+    queued_before = r.count
+    place_order
+    pay_invoice(@order.invoices.last)
+    get '/orders/queued'
+    assert last_response.ok?
+    r = JSON.parse(last_response.body)
+    queued_after = r.count
+    assert_equal queued_after, queued_before + 1
   end
 
   def test_get_orders_sent
     get '/orders/sent'
     assert last_response.ok?
-    r = JSON.parse(last_response.body)
-    assert_equal r.count, 0
   end
 
   def test_get_order
@@ -94,8 +104,8 @@ class MainAppTest < Minitest::Test
   end
   
   def test_bump
-    header 'X-Auth-Token', @order['auth_token']
-    post "/order/#{@order_uuid}/bump", params={"bid" => DEFAULT_BID + 1}
+    header 'X-Auth-Token', @order.user_auth_token
+    post "/order/#{@order.uuid}/bump", params={"bid" => DEFAULT_BID + 1}
     assert last_response.ok?
     r = JSON.parse(last_response.body)
     refute_nil r['auth_token']
@@ -104,31 +114,34 @@ class MainAppTest < Minitest::Test
   end
 
   def test_that_bumping_down_fails
-    header 'X-Auth-Token', @order['auth_token']
-    post "/order/#{@order_uuid}/bump", params={"bid" => DEFAULT_BID - 1}
+    header 'X-Auth-Token', @order.user_auth_token
+    post "/order/#{@order.uuid}/bump", params={"bid" => DEFAULT_BID - 1}
     refute last_response.ok?
   end
 
   def test_order_deletion
-    header 'X-Auth-Token', @order['auth_token']
-    delete "/order/#{@order_uuid}"
-    assert last_response.ok?    
-    delete "/order/#{@order_uuid}"
+    header 'X-Auth-Token', @order.user_auth_token
+    cancelled_before = Order.where(status: :cancelled).count
+    delete "/order/#{@order.uuid}"
+    cancelled_after = Order.where(status: :cancelled).count
+    assert last_response.ok?
+    assert_equal cancelled_after, cancelled_before + 1
+    delete "/order/#{@order.uuid}"
     refute last_response.ok?
   end
   
-  def test_get_message
+  def test_get_sent_message
     place_order
-    assert last_response.ok?
-    o = Order.pending.last
-    
-    get "/order/#{o.uuid}/sent_message"
+    get "/order/#{@order.uuid}/sent_message"
     refute last_response.ok?
 
-    o.pay!
-    o.transmit!
-    o.end_transmission!
-    get "/order/#{o.uuid}/sent_message"
+    pay_invoice(@order.invoices.last)
+    @order.transmit!
+    get "/order/#{@order.uuid}/sent_message"
+    assert last_response.ok?
+    
+    @order.end_transmission!
+    get "/order/#{@order.uuid}/sent_message"
     assert last_response.ok?
     
   end
