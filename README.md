@@ -70,7 +70,7 @@ curl -v -H "X-Auth-Token: 5248b13a722cd9b2e17ed3a2da8f7ac6bd9a8fe7130357615e0745
 
 ### GET /order/:uuid/sent_message ###
 
-Given an order UUID, retrieve a sent message. No authorization required.
+Given an order UUID, retrieve its message. The message must be sent or in process of being transmitted. No authorization required.
 
 ```bash
 curl -v $IONOSPHERE//order/409348bc-6af0-4999-b715-4136753979df/sent_message

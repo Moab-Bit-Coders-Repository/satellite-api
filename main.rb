@@ -70,7 +70,7 @@ get '/orders/pending' do
 end
 
 get '/order/:uuid/sent_message' do
-  (order = Order.find_by(uuid: params[:uuid], status: :sent)) || halt(404, {:message => "Not found", :errors => ["Sent order with that id not found"]}.to_json)
+  (order = Order.find_by(uuid: params[:uuid], status: [:sent, :transmitting])) || halt(404, {:message => "Not found", :errors => ["Sent order with that id not found"]}.to_json)
   send_file order.message_path, :disposition => 'attachment'
 end
 
