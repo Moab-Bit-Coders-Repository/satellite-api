@@ -116,5 +116,21 @@ class MainAppTest < Minitest::Test
     delete "/order/#{@order_uuid}"
     refute last_response.ok?
   end
+  
+  def test_get_message
+    place_order
+    assert last_response.ok?
+    o = Order.pending.last
+    
+    get "/order/#{o.uuid}/sent_message"
+    refute last_response.ok?
+
+    o.pay!
+    o.transmit!
+    o.end_transmission!
+    get "/order/#{o.uuid}/sent_message"
+    assert last_response.ok?
+    
+  end
 
 end

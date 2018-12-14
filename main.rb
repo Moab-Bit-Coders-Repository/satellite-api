@@ -69,9 +69,9 @@ get '/orders/pending' do
        .limit(PAGE_SIZE).to_json(:only => Order::PUBLIC_FIELDS)
 end
 
-get '/orders/:uuid/message' do
-  uuid_path_component = sanitize_uuid_param(params[:uuid])
-  send_file File.join(MESSAGE_STORE_PATH, uuid_path_component), :disposition => 'attachment'
+get '/order/:uuid/sent_message' do
+  (order = Order.find_by(uuid: params[:uuid], status: :sent)) || halt(404, {:message => "Not found", :errors => ["Sent order with that id not found"]}.to_json)
+  send_file order.message_path, :disposition => 'attachment'
 end
 
 # POST /order
