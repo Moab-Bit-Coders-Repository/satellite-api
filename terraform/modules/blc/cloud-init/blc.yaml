@@ -193,14 +193,14 @@ write_files:
         ExecStart=/usr/bin/docker run \
             --network=host \
             --pid=host \
-            --name=ionosphere \
+            --name=ionosphere-tx \
             -v /mnt/disks/data/ionosphere:/data \
             -e "RACK_ENV=production" \
             -e "CHARGE_ROOT=http://api-token:${rpcpass}@localhost:9112" \
             -e "CALLBACK_URI_ROOT=http://localhost:9292" \
             "${ionosphere_docker}" ./docker_entrypoint_transmitter.sh
-        ExecStop=/usr/bin/docker stop ionosphere
-        ExecStopPost=/usr/bin/docker rm ionosphere
+        ExecStop=/usr/bin/docker stop ionosphere-tx
+        ExecStopPost=/usr/bin/docker rm ionosphere-tx
 
 
   - path: /etc/systemd/system/charge.service
