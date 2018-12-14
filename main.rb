@@ -145,7 +145,6 @@ post '/order/:uuid/bump' do
 
   Order.transaction do
     order.save
-    invoice.order = order
     invoice.save
   end
   
