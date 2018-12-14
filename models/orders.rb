@@ -53,7 +53,7 @@ class Order < ActiveRecord::Base
   
   # have all invoices been paid?
   def invoices_all_paid?
-    self.invoices(:fields => [:paid_at]).map {|i| not i.paid_at.nil?}.reduce(:&)
+    self.invoices.pluck(:paid_at).map {|i| not i.nil?}.reduce(:&)
   end
   
   USER_AUTH_KEY = hash_hmac('sha256', 'user-token', CHARGE_API_TOKEN)
