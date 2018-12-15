@@ -33,3 +33,8 @@ variable "ionosphere_docker" {
   type    = "string"
   default = "us.gcr.io/blockstream-store/ionosphere@sha256:32ad7042d8e457066eb0bb88f8df5f16ab97c0791c6ec8fdc5d3d49182f05ecb"
 }
+
+variable "ionosphere_sse_docker" {
+  type    = "string"
+  default = ""
+}

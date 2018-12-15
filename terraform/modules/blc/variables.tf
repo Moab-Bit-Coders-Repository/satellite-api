@@ -28,6 +28,10 @@ variable "ionosphere_docker" {
   type = "string"
 }
 
+variable "ionosphere_sse_docker" {
+  type = "string"
+}
+
 variable "network" {
   type = "string"
 }

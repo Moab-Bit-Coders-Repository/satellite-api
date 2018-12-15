@@ -15,14 +15,15 @@ provider "google" {
 module "blc" {
   source = "modules/blc"
 
-  project           = "${var.project}"
-  name              = "ionosphere-blc"
-  network           = "default"
-  bitcoin_docker    = "${var.bitcoin_docker}"
-  lightning_docker  = "${var.lightning_docker}"
-  charge_docker     = "${var.charge_docker}"
-  ionosphere_docker = "${var.ionosphere_docker}"
-  net               = "testnet"
+  project               = "${var.project}"
+  name                  = "ionosphere-blc"
+  network               = "default"
+  bitcoin_docker        = "${var.bitcoin_docker}"
+  lightning_docker      = "${var.lightning_docker}"
+  charge_docker         = "${var.charge_docker}"
+  ionosphere_docker     = "${var.ionosphere_docker}"
+  ionosphere_sse_docker = "${var.ionosphere_sse_docker}"
+  net                   = "testnet"
 
   # CI vars
   region        = "us-west1"

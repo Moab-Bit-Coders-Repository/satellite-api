@@ -24,6 +24,15 @@ build_ionosphere:
     - docker push us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA
     - docker push us.gcr.io/blockstream-store/ionosphere:latest
 
+build_ionosphere_sse:
+  only:
+    - master@satellite/ionosphere
+  stage: build
+  script:
+    - cd sse && docker build -f Dockerfile -t us.gcr.io/blockstream-store/ionosphere-sse:latest -t us.gcr.io/blockstream-store/ionosphere-sse:$CI_COMMIT_SHA .
+    - docker push us.gcr.io/blockstream-store/ionosphere-sse:$CI_COMMIT_SHA
+    - docker push us.gcr.io/blockstream-store/ionosphere-sse:latest
+
 deploy_ionosphere:
   stage: deploy
   only:
@@ -35,4 +44,5 @@ deploy_ionosphere:
         -auto-approve)
     - (cd terraform && terraform apply
         -var "ionosphere_docker=us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA"
+        -var "ionosphere_sse_docker=us.gcr.io/blockstream-store/ionosphere-sse:$CI_COMMIT_SHA"
         -input=false -auto-approve)

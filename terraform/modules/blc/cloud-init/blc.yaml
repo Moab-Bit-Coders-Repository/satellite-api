@@ -140,6 +140,30 @@ write_files:
         ExecStopPost=/usr/bin/docker rm lightning
         ExecStopPost=/sbin/iptables -D INPUT -p tcp --dport ${lightning_port} -j ACCEPT
 
+  - path: /etc/systemd/system/redis.service
+    permissions: 0644
+    owner: root
+    content: |
+        [Unit]
+        Description=Redis db for server-side events
+        Wants=gcr-online.target
+        After=gcr-online.service
+
+        [Service]
+        Restart=always
+        RestartSec=3
+        Environment=HOME=/home/bs
+        ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+        ExecStartPre=/sbin/iptables -A INPUT -p tcp --dport ${redis_port} -j ACCEPT
+        ExecStart=/usr/bin/docker run \
+            --network=host \
+            --pid=host \
+            --name=sse-redis-db \
+            "redis:latest"
+        ExecStop=/usr/bin/docker stop sse-redis-db
+        ExecStopPost=/usr/bin/docker rm sse-redis-db
+        ExecStopPost=/sbin/iptables -D INPUT -p tcp --dport ${redis_port} -j ACCEPT
+
   - path: /etc/systemd/system/ionosphere.service
     permissions: 0644
     owner: root
@@ -199,6 +223,28 @@ write_files:
         ExecStop=/usr/bin/docker stop ionosphere-tx
         ExecStopPost=/usr/bin/docker rm ionosphere-tx
 
+  - path: /etc/systemd/system/ionosphere-sse.service
+    permissions: 0644
+    owner: root
+    content: |
+        [Unit]
+        Description=Ionosphere Server-Side Events Server
+        Wants=gcr-online.target
+        After=redis.service
+
+        [Service]
+        Restart=always
+        RestartSec=3
+        Environment=HOME=/home/bs
+        ExecStart=/usr/bin/docker run \
+            --network=host \
+            --pid=host \
+            --name=ionosphere-sse \
+            -e "SUB_CHANNELS=transmissions" \
+            -e "REDIS_URI=redis://localhost:6379" \
+            "${ionosphere_sse_docker}"
+        ExecStop=/usr/bin/docker stop ionosphere-sse
+        ExecStopPost=/usr/bin/docker rm ionosphere-sse
 
   - path: /etc/systemd/system/charge.service
     permissions: 0644
@@ -234,10 +280,14 @@ runcmd:
   - systemctl enable bitcoin.service
   - systemctl start lightning.service
   - systemctl enable lightning.service
+  - systemctl start redis.service
+  - systemctl enable redis.service
   - systemctl start ionosphere.service
   - systemctl enable ionosphere.service
   - systemctl start ionosphere-tx.service
   - systemctl enable ionosphere-tx.service
+  - systemctl start ionosphere-sse.service
+  - systemctl enable ionosphere-sse.service
   - systemctl start charge.service
   - systemctl enable charge.service
   - systemctl start nginx.service
