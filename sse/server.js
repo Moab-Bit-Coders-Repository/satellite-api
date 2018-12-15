@@ -42,6 +42,5 @@ app.get('/stream', (req, res) => {
 
 app.listen(
     process.env.PORT || 4500,
-    process.env.ADDRESS || '127.0.0.1',
     function() { console.log(`HTTP server running on ${this.address().address}:${this.address().port}`) }
 )
