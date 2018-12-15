@@ -1,6 +1,6 @@
 // Setup redis
-const redis = require('redis').createClient(process.env.REDIS_URI)
-    , channels = process.env.SUB_CHANNELS.split(',')
+const redis = require('redis').createClient(process.env.REDIS_URI),
+	  channels = process.env.SUB_CHANNELS.split(',')
 
 console.log(`Subscribing to Redis on ${channels.join(',')}`)
 channels.forEach(chan => redis.subscribe(chan))
@@ -16,32 +16,32 @@ app.use(require('morgan')('dev'))
 
 // SSE endpoint
 app.get('/stream', (req, res) => {
-  const subscriptions = req.query.channels && req.query.channels.split(',')
-  console.log(`New subscriber for ${ subscriptions ? subscriptions.join(',') : 'all channels' }`)
+    const subscriptions = req.query.channels && req.query.channels.split(',')
+    console.log(`New subscriber for ${ subscriptions ? subscriptions.join(',') : 'all channels' }`)
 
-  res.set({
-    'X-Accel-Buffering': 'no'
-  , 'Cache-Control': 'no-cache'
-  , 'Content-Type': 'text/event-stream'
-  , 'Connection': 'keep-alive'
-  }).flushHeaders()
+    res.set({
+        'X-Accel-Buffering': 'no',
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'text/event-stream',
+        'Connection': 'keep-alive'
+    }).flushHeaders()
 
-  function onMsg (chan, msg) {
-    if (!subscriptions || subscriptions.includes(chan)) {
-      res.write(`event:${chan}\ndata:${msg}\n\n`)
+    function onMsg (chan, msg) {
+        if (!subscriptions || subscriptions.includes(chan)) {
+            res.write(`event:${chan}\ndata:${msg}\n\n`)
+        }
     }
-  }
-  redis.on('message', onMsg)
+    redis.on('message', onMsg)
 
-  const keepAlive = setInterval(_ => res.write(': keepalive\n\n'), 25000)
+    const keepAlive = setInterval(_ => res.write(': keepalive\n\n'), 25000)
 
-  req.once('close', _ => (redis.removeListener('message', onMsg)
-                        , clearInterval(keepAlive)
-                        , console.log('Subscriber disconnected')))
+    req.once('close', _ => (redis.removeListener('message', onMsg),
+                            clearInterval(keepAlive),
+                            console.log('Subscriber disconnected')))
 })
 
 app.listen(
-  process.env.PORT || 4500
-, process.env.ADDRESS || '127.0.0.1'
-, function() { console.log(`HTTP server running on ${this.address().address}:${this.address().port}`) }
+    process.env.PORT || 4500,
+    process.env.ADDRESS || '127.0.0.1',
+    function() { console.log(`HTTP server running on ${this.address().address}:${this.address().port}`) }
 )
