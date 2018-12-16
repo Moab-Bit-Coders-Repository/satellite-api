@@ -29,6 +29,4 @@ COPY . /app
 RUN chown -R ionosphere:ionosphere /app
 USER ionosphere
 
-EXPOSE 9292
-
 CMD ./docker_entrypoint.sh

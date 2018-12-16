@@ -23,12 +23,7 @@ build_ionosphere:
     - docker build -f Dockerfile -t us.gcr.io/blockstream-store/ionosphere:latest -t us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA .
     - docker push us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA
     - docker push us.gcr.io/blockstream-store/ionosphere:latest
-
-build_ionosphere_sse:
-  only:
-    - master@satellite/ionosphere
-  stage: build
-  script:
+    - echo "Building Ionosphere SSE image"
     - cd sse && docker build -f Dockerfile -t us.gcr.io/blockstream-store/ionosphere-sse:latest -t us.gcr.io/blockstream-store/ionosphere-sse:$CI_COMMIT_SHA .
     - docker push us.gcr.io/blockstream-store/ionosphere-sse:$CI_COMMIT_SHA
     - docker push us.gcr.io/blockstream-store/ionosphere-sse:latest
