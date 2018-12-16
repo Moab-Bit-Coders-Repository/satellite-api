@@ -29,7 +29,7 @@ write_files:
 
             location /api/ {
                 add_header 'Access-Control-Allow-Origin' '*' always;
-                add_header 'Access-Control-Allow-Methods' 'GET, POST';
+                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE' always;
                 add_header X-XSS-Protection "1; mode=block";
 
                 proxy_set_header Host $host;
@@ -154,7 +154,7 @@ write_files:
         RestartSec=3
         Environment=HOME=/home/bs
         ExecStartPre=/usr/bin/docker pull redis:latest
-        ExecStartPre=/sbin/iptables -A INPUT -p tcp --dport ${redis_port} -j ACCEPT
+        ExecStartPre=/sbin/iptables -A INPUT -p tcp -s localhost --dport ${redis_port} -j ACCEPT
         ExecStart=/usr/bin/docker run \
             --network=host \
             --pid=host \
@@ -162,7 +162,7 @@ write_files:
             "redis:latest"
         ExecStop=/usr/bin/docker stop sse-redis-db
         ExecStopPost=/usr/bin/docker rm sse-redis-db
-        ExecStopPost=/sbin/iptables -D INPUT -p tcp --dport ${redis_port} -j ACCEPT
+        ExecStopPost=/sbin/iptables -D INPUT -p tcp -s localhost --dport ${redis_port} -j ACCEPT
 
   - path: /etc/systemd/system/ionosphere.service
     permissions: 0644
@@ -237,7 +237,7 @@ write_files:
         RestartSec=3
         Environment=HOME=/home/bs
         ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
-        ExecStartPre=/usr/bin/docker pull ${ionosphere_sse_docker}        
+        ExecStartPre=/usr/bin/docker pull ${ionosphere_sse_docker}
         ExecStart=/usr/bin/docker run \
             --network=host \
             --pid=host \
