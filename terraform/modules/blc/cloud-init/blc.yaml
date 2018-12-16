@@ -153,7 +153,7 @@ write_files:
         Restart=always
         RestartSec=3
         Environment=HOME=/home/bs
-        ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+        ExecStartPre=/usr/bin/docker pull redis:latest
         ExecStartPre=/sbin/iptables -A INPUT -p tcp --dport ${redis_port} -j ACCEPT
         ExecStart=/usr/bin/docker run \
             --network=host \
@@ -236,6 +236,8 @@ write_files:
         Restart=always
         RestartSec=3
         Environment=HOME=/home/bs
+        ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+        ExecStartPre=/usr/bin/docker pull ${ionosphere_sse_docker}        
         ExecStart=/usr/bin/docker run \
             --network=host \
             --pid=host \
