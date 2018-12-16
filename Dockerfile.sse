@@ -4,11 +4,11 @@ FROM node:8
 WORKDIR /usr/src/app
 
 # Install app dependencies
-COPY package*.json ./
+COPY sse/package*.json ./
 
 RUN npm install
 
 # Bundle app source
-COPY . .
+COPY sse/ .
 
 CMD [ "npm", "start" ]
