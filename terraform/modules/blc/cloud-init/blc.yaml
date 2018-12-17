@@ -28,9 +28,17 @@ write_files:
             server_tokens off;
 
             location /api/ {
-                add_header 'Access-Control-Allow-Origin' '*' always;
-                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE' always;
-                add_header X-XSS-Protection "1; mode=block";
+                add_header 'Access-Control-Allow-Headers' null always;
+                add_header 'Access-Control-Allow-Origin' null always;
+                add_header 'X-XSS-Protection' '1; mode=block' always;
+
+                if ($http_origin ~ '(preview.)?blockstream.com')
+                {
+                  add_header 'Access-Control-Allow-Origin' '$http_origin' always;
+                  add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE' always;
+                  add_header 'Access-Control-Allow-Headers' 'X-Auth-Token,DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range' always;
+                  add_header 'X-XSS-Protection' '1; mode=block' always;
+                }
 
                 proxy_set_header Host $host;
                 proxy_set_header X-Forwarded-For $remote_addr;
