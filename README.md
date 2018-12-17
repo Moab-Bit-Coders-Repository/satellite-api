@@ -12,7 +12,7 @@ Ionosphere itself is comprised of a RESTful API server and a transmitter daemon.
 
 ## Run ##
 
-The included `Dockerfile` builds a Docker file with the necessary gem dependencies, directory structure, and permissions. The included `docker_entrypoint.sh` runs the API server, transmitter daemon, and (optionally in development mode) a test daemon that simulates the GNU Radio application by reading from the FIFO and writing received messages to a tmp directory.
+The included `Dockerfile` builds a Docker file with the necessary gem dependencies, directory structure, and permissions. The included `docker_entrypoint.sh` runs the API server and transmitter daemon.
 
 After building a Docker image (`ionosphere` in the example below), decide where you are going to keep your persisted data (`~/docker/data` in the example below) and run it like this:
 
@@ -122,7 +122,7 @@ The response is a JSON array of records (one for each queued message). The revea
 
 ### queue.html ###
 
-In development mode (i.e. when the ```RACK_ENV``` environment variable is set to ```development```), a FIFO consumer daemon is run that simulates the GNU Radio hardware and a debugging webpage is exposed at `$IONOSPHERE/queue.html` that supports inspection of queued and sent message orders. This webpage also serves as a demonstration of how the JSON returned by `GET /queue` can be processed by jQuery for display in an HTML table.
+For debugging and as an example of how to build a web front-end to Ionosphere, there is a simple table view of queued, pending, and sent messages at `$IONOSPHERE/queue.html`
 
 ## Future Work ##
 
