@@ -32,6 +32,7 @@ resource "google_compute_global_forwarding_rule" "rule-https" {
   target      = "${google_compute_target_https_proxy.https-proxy.self_link}"
   port_range  = "443"
   ip_protocol = "TCP"
+  ip_address  = "${google_compute_global_address.lb.address}"
 }
 
 resource "google_compute_global_forwarding_rule" "rule-http" {
@@ -39,6 +40,7 @@ resource "google_compute_global_forwarding_rule" "rule-http" {
   target      = "${google_compute_target_http_proxy.http-proxy.self_link}"
   port_range  = "80"
   ip_protocol = "TCP"
+  ip_address  = "${google_compute_global_address.lb.address}"
 }
 
 # Target proxies
