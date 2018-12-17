@@ -16,7 +16,7 @@ resource "google_compute_instance_group_manager" "blc" {
     min_ready_sec         = 60
   }
 
-  target_pools = ["${google_compute_target_pool.ionosphere.self_link}"]
+  /*target_pools = ["${google_compute_target_pool.ionosphere.self_link}"]*/
 }
 
 resource "google_compute_disk" "blc" {
