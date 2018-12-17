@@ -6,11 +6,6 @@ resource "google_compute_address" "ionosphere" {
   count   = 1
 }
 
-resource "google_compute_global_address" "lb" {
-  name    = "ionosphere-client-lb"
-  project = "${var.project}"
-}
-
 resource "google_compute_firewall" "blc" {
   name    = "ionosphere-fw-rule"
   network = "${data.google_compute_network.blc.self_link}"
@@ -50,4 +45,14 @@ resource "google_compute_health_check" "blc" {
   tcp_health_check {
     port = "80"
   }
+}
+
+resource "google_compute_http_health_check" "blc-http" {
+  name = "${var.name}-health-check"
+
+  timeout_sec        = 5
+  check_interval_sec = 10
+
+  port         = "80"
+  request_path = "/"
 }

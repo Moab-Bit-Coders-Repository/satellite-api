@@ -6,6 +6,17 @@ resource "google_compute_instance_group_manager" "blc" {
   instance_template  = "${google_compute_instance_template.blc.self_link}"
   zone               = "${var.zone}"
   target_size        = 1
+  update_strategy    = "ROLLING_UPDATE"
+
+  rolling_update_policy {
+    type                  = "PROACTIVE"
+    minimal_action        = "REPLACE"
+    max_surge_fixed       = 0
+    max_unavailable_fixed = 1
+    min_ready_sec         = 60
+  }
+
+  target_pools = ["${google_compute_target_pool.ionosphere.self_link}"]
 }
 
 resource "google_compute_disk" "blc" {
