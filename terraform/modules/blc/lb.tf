@@ -16,7 +16,8 @@ resource "google_compute_forwarding_rule" "ionosphere-http" {
 }
 
 resource "google_compute_target_pool" "ionosphere" {
-  name = "${var.name}-proxy"
+  name   = "${var.name}-proxy"
+  region = "${var.region}"
 
   health_checks = [
     "${google_compute_http_health_check.blc-http.self_link}",
