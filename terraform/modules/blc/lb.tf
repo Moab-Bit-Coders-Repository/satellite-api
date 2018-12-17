@@ -1,6 +1,7 @@
 # Forwarding rules
 resource "google_compute_forwarding_rule" "ionosphere-https" {
   name        = "${var.name}-https"
+  region      = "${var.region}"
   target      = "${google_compute_target_pool.ionosphere.self_link}"
   port_range  = "443"
   ip_protocol = "TCP"
@@ -9,6 +10,7 @@ resource "google_compute_forwarding_rule" "ionosphere-https" {
 
 resource "google_compute_forwarding_rule" "ionosphere-http" {
   name        = "${var.name}-http"
+  region      = "${var.region}"
   target      = "${google_compute_target_pool.ionosphere.self_link}"
   port_range  = "80"
   ip_protocol = "TCP"
