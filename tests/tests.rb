@@ -41,15 +41,24 @@ class MainAppTest < Minitest::Test
   def write_response
     File.open('response.html', 'w') { |file| file.write(last_response.body) }
   end
+  
+  def order_is_queued(uuid)
+    get '/orders/queued'
+    assert last_response.ok?
+    r = JSON.parse(last_response.body)
+    uuids = r.map {|o| o['uuid']}
+    uuids.include?(uuid)
+  end
 
   def test_get_orders_queued
-    get '/orders/queued'
+    get "/orders/queued?limit=#{MAX_QUEUED_ORDERS_REQUEST}"
     assert last_response.ok?
     r = JSON.parse(last_response.body)
     queued_before = r.count
     place_order
     pay_invoice(@order.invoices.last)
-    get '/orders/queued'
+    assert order_is_queued(@order.uuid)
+    get "/orders/queued?limit=#{MAX_QUEUED_ORDERS_REQUEST}"
     assert last_response.ok?
     r = JSON.parse(last_response.body)
     queued_after = r.count
@@ -104,6 +113,10 @@ class MainAppTest < Minitest::Test
   end
   
   def test_bump
+    place_order
+    refute order_is_queued(@order.uuid)
+    pay_invoice(@order.invoices.last)
+    assert order_is_queued(@order.uuid)
     header 'X-Auth-Token', @order.user_auth_token
     post "/order/#{@order.uuid}/bump", params={"bid" => DEFAULT_BID + 1}
     assert last_response.ok?
@@ -111,6 +124,10 @@ class MainAppTest < Minitest::Test
     refute_nil r['auth_token']
     refute_nil r['uuid']
     refute_nil r['lightning_invoice']
+    lid = r['lightning_invoice']['id']
+    refute order_is_queued(@order.uuid)
+    pay_invoice(Invoice.find_by_lid(lid))
+    assert order_is_queued(@order.uuid)    
   end
 
   def test_that_bumping_down_fails
@@ -136,6 +153,7 @@ class MainAppTest < Minitest::Test
     refute last_response.ok?
 
     pay_invoice(@order.invoices.last)
+    @order.reload
     @order.transmit!
     get "/order/#{@order.uuid}/sent_message"
     assert last_response.ok?
