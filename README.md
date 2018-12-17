@@ -53,7 +53,7 @@ If successful, the response includes the JSON Lightning invoice as returned by L
 Increase the bid for an order sitting in the transmission queue. The new `bid` must be provided in the body of the POST and must be greater than the current bid. An `auth_token` must also be provided. For example, to bump up the bid on the order placed above to 700,000 millisatoshis, issue a POST like this:
 
 ```bash
-curl -v -F "bid=700000" -F "auth_token=d784e322dad7ec2671086ce3ad94e05108f2501180d8228577fbec4115774750" localhost:9292//order/409348bc-6af0-4999-b715-4136753979df/bump
+curl -v -F "bid=700000" -F "auth_token=d784e322dad7ec2671086ce3ad94e05108f2501180d8228577fbec4115774750" $IONOSPHERE//order/409348bc-6af0-4999-b715-4136753979df/bump
 ```
 
 Response object is in the same format as for `POST /order`.
