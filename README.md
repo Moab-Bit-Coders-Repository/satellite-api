@@ -53,7 +53,7 @@ If successful, the response includes the JSON Lightning invoice as returned by L
 Increase the bid for an order sitting in the transmission queue. The new `bid` must be provided in the body of the POST and must be greater than the current bid. An `auth_token` must also be provided. For example, to bump up the bid on the order placed above to 700,000 millisatoshis, issue a POST like this:
 
 ```bash
-curl -v -F "bid=700000" -F "auth_token=d784e322dad7ec2671086ce3ad94e05108f2501180d8228577fbec4115774750" $IONOSPHERE//order/409348bc-6af0-4999-b715-4136753979df/bump
+curl -v -F "bid=700000" -F "auth_token=d784e322dad7ec2671086ce3ad94e05108f2501180d8228577fbec4115774750" $IONOSPHERE/order/409348bc-6af0-4999-b715-4136753979df/bump
 ```
 
 Response object is in the same format as for `POST /order`.
@@ -65,7 +65,7 @@ As shown below for DELETE, the `auth_token` may alternatively be provided using 
 Retrieve an order by UUID. Must provide the corresponding auth token to prove that it is yours.
 
 ```bash
-curl -v -H "X-Auth-Token: 5248b13a722cd9b2e17ed3a2da8f7ac6bd9a8fe7130357615e074596e3d5872f" $IONOSPHERE//order/409348bc-6af0-4999-b715-4136753979df
+curl -v -H "X-Auth-Token: 5248b13a722cd9b2e17ed3a2da8f7ac6bd9a8fe7130357615e074596e3d5872f" $IONOSPHERE/order/409348bc-6af0-4999-b715-4136753979df
 ```
 
 ### GET /order/:uuid/sent_message ###
@@ -73,7 +73,7 @@ curl -v -H "X-Auth-Token: 5248b13a722cd9b2e17ed3a2da8f7ac6bd9a8fe7130357615e0745
 Given an order UUID, retrieve its message. The message must be sent or in process of being transmitted. No authorization required.
 
 ```bash
-curl -v $IONOSPHERE//order/409348bc-6af0-4999-b715-4136753979df/sent_message
+curl -v $IONOSPHERE/order/409348bc-6af0-4999-b715-4136753979df/sent_message
 ```
 
 ### DELETE /order/:uuid ###
@@ -81,13 +81,13 @@ curl -v $IONOSPHERE//order/409348bc-6af0-4999-b715-4136753979df/sent_message
 To cancel an order, issue an HTTP DELETE request to the API endpoint `/order/:uuid/` providing the UUID of the order. An `auth_token` must also be provided. For example, to cancel the order above, issue a request like this:
 
 ```bash
-curl -v -X DELETE -F "auth_token=5248b13a722cd9b2e17ed3a2da8f7ac6bd9a8fe7130357615e074596e3d5872f" $IONOSPHERE//order/409348bc-6af0-4999-b715-4136753979df
+curl -v -X DELETE -F "auth_token=5248b13a722cd9b2e17ed3a2da8f7ac6bd9a8fe7130357615e074596e3d5872f" $IONOSPHERE/order/409348bc-6af0-4999-b715-4136753979df
 ```
 
 The `auth_token` may be provided as a parameter in the DELETE body as above or may be provided using the `X-Auth-Token` HTTP header, like this:
 
 ```bash
-curl -v -X DELETE -H "X-Auth-Token: 5248b13a722cd9b2e17ed3a2da8f7ac6bd9a8fe7130357615e074596e3d5872f" $IONOSPHERE//order/409348bc-6af0-4999-b715-4136753979df
+curl -v -X DELETE -H "X-Auth-Token: 5248b13a722cd9b2e17ed3a2da8f7ac6bd9a8fe7130357615e074596e3d5872f" $IONOSPHERE/order/409348bc-6af0-4999-b715-4136753979df
 ```
 
 ### GET /orders/queued  ###
