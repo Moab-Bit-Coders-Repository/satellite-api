@@ -6,6 +6,11 @@ resource "google_compute_address" "ionosphere" {
   count   = 1
 }
 
+resource "google_compute_global_address" "lb" {
+  name    = "ionosphere-client-lb"
+  project = "${var.project}"
+}
+
 resource "google_compute_firewall" "blc" {
   name    = "ionosphere-fw-rule"
   network = "${data.google_compute_network.blc.self_link}"
@@ -26,7 +31,7 @@ resource "google_compute_backend_service" "blc" {
   description = "Ionosphere"
   protocol    = "HTTP"
   port_name   = "http"
-  timeout_sec = 15
+  timeout_sec = 7200
 
   backend {
     group = "${google_compute_instance_group_manager.blc.instance_group}"
