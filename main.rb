@@ -175,6 +175,14 @@ post '/callback/:lid/:charged_auth_token' do
   param :lid, String, required: true
   param :charged_auth_token, String, required: true
 
+  unless invoice
+    halt 404, {:message => "Payment problem", :errors => ["Invoice not found"]}.to_json
+  end
+
+  unless invoice.order
+    halt 404, {:message => "Payment problem", :errors => ["Orphaned invoice"]}.to_json
+  end
+
   unless invoice.order.status == 'pending'
     halt 400, {:message => "Payment problem", :errors => ["Order already #{invoice.order.status}"]}.to_json
   end
