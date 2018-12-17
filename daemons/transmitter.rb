@@ -2,6 +2,9 @@ require 'active_record'
 require_relative '../constants'
 require_relative '../models/init'
 
+# complete any old transmissions that could be stuck (e.g. by early termination of the transmitter daemon)
+Order.transmitting.each {|o| o.end_transmission!}
+
 # loop forever dequing the highest-priced paid order and piping it to the GNU radio FIFO
 loop do
   sendable_order = nil
