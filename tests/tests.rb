@@ -39,7 +39,7 @@ class MainAppTest < Minitest::Test
   end
   
   def write_response
-    File.open('response.html', 'w') { |file| file.write(last_response.body) }    
+    File.open('response.html', 'w') { |file| file.write(last_response.body) }
   end
 
   def test_get_orders_queued
@@ -110,7 +110,7 @@ class MainAppTest < Minitest::Test
     r = JSON.parse(last_response.body)
     refute_nil r['auth_token']
     refute_nil r['uuid']
-    refute_nil r['lightning_invoice']    
+    refute_nil r['lightning_invoice']
   end
 
   def test_that_bumping_down_fails
