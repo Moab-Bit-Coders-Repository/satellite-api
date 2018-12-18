@@ -17,9 +17,9 @@ before_script:
   - gcloud --version
 
 build_ionosphere:
+  stage: build
   only:
     - master@satellite/ionosphere
-  stage: build
   script:
     - docker build -f Dockerfile -t us.gcr.io/blockstream-store/ionosphere:latest -t us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA .
     - docker push us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA
@@ -41,6 +41,12 @@ plan_ionosphere:
        && terraform plan
          -var "ionosphere_docker=us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA"
          -var "ionosphere_sse_docker=us.gcr.io/blockstream-store/ionosphere-sse:$CI_COMMIT_SHA"
+         -var "region=$REGION"
+         -var "zone=$ZONE"
+         -var "instance_type=$INSTANCE_TYPE"
+         -var "host=$HOST"
+         -var "ssl_cert=$SSL_CERT"
+         -var "timeout=$TIMEOUT"
          -input=false)
 
 deploy_ionosphere:
@@ -53,4 +59,10 @@ deploy_ionosphere:
        && terraform apply
          -var "ionosphere_docker=us.gcr.io/blockstream-store/ionosphere:$CI_COMMIT_SHA"
          -var "ionosphere_sse_docker=us.gcr.io/blockstream-store/ionosphere-sse:$CI_COMMIT_SHA"
+         -var "region=$REGION"
+         -var "zone=$ZONE"
+         -var "instance_type=$INSTANCE_TYPE"
+         -var "host=$HOST"
+         -var "ssl_cert=$SSL_CERT"
+         -var "timeout=$TIMEOUT"
          -input=false -auto-approve)

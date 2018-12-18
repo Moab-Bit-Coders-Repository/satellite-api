@@ -13,6 +13,26 @@ variable "host" {
   default = ""
 }
 
+variable "region" {
+  type    = "string"
+  default = ""
+}
+
+variable "zone" {
+  type    = "string"
+  default = ""
+}
+
+variable "instance_type" {
+  type    = "string"
+  default = ""
+}
+
+variable "timeout" {
+  type    = "string"
+  default = ""
+}
+
 # These could be overwritten by the ci with $CI_COMMIT_SHA, which is based on latest build
 variable "bitcoin_docker" {
   type    = "string"

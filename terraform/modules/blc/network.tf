@@ -31,7 +31,7 @@ resource "google_compute_backend_service" "blc" {
   description = "Ionosphere"
   protocol    = "HTTP"
   port_name   = "http"
-  timeout_sec = 7200
+  timeout_sec = "${var.timeout}"
 
   backend {
     group = "${google_compute_instance_group_manager.blc.instance_group}"

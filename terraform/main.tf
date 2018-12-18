@@ -26,9 +26,10 @@ module "blc" {
   net                   = "testnet"
 
   # CI vars
-  region        = "us-west1"
-  zone          = "us-west1-a"
-  instance_type = "custom-2-6144"
-  host          = "satellite.blockstream.com"
-  ssl_cert      = "https://www.googleapis.com/compute/v1/projects/blockstream-store/global/sslCertificates/ionosphere-12-03-2018"
+  region        = "${var.region}"
+  zone          = "${var.zone}"
+  instance_type = "${var.instance_type}"
+  host          = "${var.host}"
+  ssl_cert      = "${var.ssl_cert}"
+  timeout       = "${var.timeout}"
 }

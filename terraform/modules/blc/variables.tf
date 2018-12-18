@@ -12,26 +12,6 @@ variable "name" {
   type = "string"
 }
 
-variable "bitcoin_docker" {
-  type = "string"
-}
-
-variable "charge_docker" {
-  type = "string"
-}
-
-variable "lightning_docker" {
-  type = "string"
-}
-
-variable "ionosphere_docker" {
-  type = "string"
-}
-
-variable "ionosphere_sse_docker" {
-  type = "string"
-}
-
 variable "network" {
   type = "string"
 }
@@ -57,5 +37,29 @@ variable "ssl_cert" {
 }
 
 variable "host" {
+  type = "string"
+}
+
+variable "timeout" {
+  type = "string"
+}
+
+variable "bitcoin_docker" {
+  type = "string"
+}
+
+variable "charge_docker" {
+  type = "string"
+}
+
+variable "lightning_docker" {
+  type = "string"
+}
+
+variable "ionosphere_docker" {
+  type = "string"
+}
+
+variable "ionosphere_sse_docker" {
   type = "string"
 }
