@@ -7,7 +7,7 @@ if [ ! -f /data/ionosphere/ionosphere_production.sqlite3 ]; then
 fi
 
 echo "starting transmitter"
-bundle exec ruby daemons/transmitter.rb start
+bundle exec ruby daemons/transmitter.rb
 
 # shutdown the entire process when any of the background jobs exits (even if successfully)
 wait -n
