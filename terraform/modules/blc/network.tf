@@ -11,6 +11,7 @@ resource "google_compute_global_address" "lb" {
   project = "${var.project}"
 }
 
+# FW rules
 resource "google_compute_firewall" "blc" {
   name    = "ionosphere-fw-rule"
   network = "${data.google_compute_network.blc.self_link}"
@@ -19,6 +20,24 @@ resource "google_compute_firewall" "blc" {
     protocol = "tcp"
     ports    = ["18333", "18332", "9735", "80"]
   }
+
+  target_service_accounts = [
+    "${google_service_account.blc.email}",
+  ]
+}
+
+resource "google_compute_firewall" "blc-prom" {
+  name    = "${var.name}-prometheus-access"
+  network = "${data.google_compute_network.blc.self_link}"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["9100"]
+  }
+
+  source_service_accounts = [
+    "${var.prom_service_acct}",
+  ]
 
   target_service_accounts = [
     "${google_service_account.blc.email}",

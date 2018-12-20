@@ -30,31 +30,42 @@ variable "instance_type" {
 
 variable "timeout" {
   type    = "string"
+  default = 15
+}
+
+variable "prom_service_acct" {
+  type    = "string"
   default = ""
 }
 
-# These could be overwritten by the ci with $CI_COMMIT_SHA, which is based on latest build
-variable "bitcoin_docker" {
-  type    = "string"
-  default = "us.gcr.io/blockstream-store/bitcoind017@sha256:7577cd3cb0620ca9f6abffb3814dbb78b6faa1f8debf07d7dfd16cb192feecd9"
-}
-
-variable "lightning_docker" {
-  type    = "string"
-  default = "us.gcr.io/blockstream-store/lightningd@sha256:082d2d7d589ae83e01dfe8db9ef432e185c9f8a66b2ea063e9147921e181bf20"
-}
-
-variable "charge_docker" {
-  type    = "string"
-  default = "us.gcr.io/blockstream-store/charged@sha256:f13a7b0d4a81a2b9d45abc63d2d37846f3cb8e9e2f019ca1aa66475d73c2716f"
-}
-
+# Overwritten by CI
 variable "ionosphere_docker" {
   type    = "string"
-  default = "us.gcr.io/blockstream-store/ionosphere@sha256:32ad7042d8e457066eb0bb88f8df5f16ab97c0791c6ec8fdc5d3d49182f05ecb"
+  default = ""
 }
 
 variable "ionosphere_sse_docker" {
   type    = "string"
   default = ""
+}
+
+# Less frequently updated images
+variable "node_exporter_docker" {
+  type    = "string"
+  default = "prom/node-exporter@sha256:55302581333c43d540db0e144cf9e7735423117a733cdec27716d87254221086"
+}
+
+variable "bitcoin_docker" {
+  type    = "string"
+  default = "us.gcr.io/blockstream-store/bitcoind@sha256:d385d5455000b85b0e2103cdbc69e642c46872b698ff807892ba4c4a40e72ca7"
+}
+
+variable "lightning_docker" {
+  type    = "string"
+  default = "us.gcr.io/blockstream-store/lightningd@sha256:e2b557e6ff50f0e7f1cf44f5b7a1a85af65f39cacffa0a699cacfa04c7c2d175"
+}
+
+variable "charge_docker" {
+  type    = "string"
+  default = "us.gcr.io/blockstream-store/charged@sha256:669893e02a14863f469498a40626e46de3ec67ff2ee4d7443cd56bc6ba3a8f3a"
 }

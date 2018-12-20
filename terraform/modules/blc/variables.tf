@@ -44,6 +44,10 @@ variable "timeout" {
   type = "string"
 }
 
+variable "prom_service_acct" {
+  type = "string"
+}
+
 variable "bitcoin_docker" {
   type = "string"
 }
@@ -61,5 +65,9 @@ variable "ionosphere_docker" {
 }
 
 variable "ionosphere_sse_docker" {
+  type = "string"
+}
+
+variable "node_exporter_docker" {
   type = "string"
 }

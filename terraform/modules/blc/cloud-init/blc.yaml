@@ -52,12 +52,10 @@ write_files:
 
             # Proxy SSE container
             location /api/subscribe/ {
-
                 chunked_transfer_encoding off;
                 proxy_buffering off;
                 proxy_request_buffering off;
                 proxy_cache off;
-
                 proxy_http_version 1.1;
 
                 proxy_pass http://0.0.0.0:4500/stream?channels=;
@@ -97,7 +95,7 @@ write_files:
 
         [Service]
         Restart=always
-        RestartSec=1
+        RestartSec=3
         Environment=HOME=/home/bs
         ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
         ExecStartPre=/sbin/iptables -A INPUT -m tcp -p tcp --dport 80 -j ACCEPT
@@ -110,6 +108,35 @@ write_files:
         ExecStop=/usr/bin/docker stop nginx
         ExecStopPost=/usr/bin/docker rm nginx
         ExecStopPost=/sbin/iptables -D INPUT -m tcp -p tcp --dport 80 -j ACCEPT
+
+  - path: /etc/systemd/system/node-exporter.service
+    permissions: 0644
+    owner: root
+    content: |
+        [Unit]
+        Description=Prometheus node-exporter
+        Wants=gcr-online.target docker.service
+        After=gcr-online.service docker.service
+
+        [Service]
+        Restart=always
+        RestartSec=3
+        Environment=HOME=/home/bs
+        ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+        ExecStartPre=/usr/bin/docker pull ${node_exporter_docker}
+        ExecStartPre=/sbin/iptables -A INPUT -m tcp -p tcp --dport 9100 -j ACCEPT
+        ExecStart=/usr/bin/docker run \
+            --name=node-exporter \
+            --network=host \
+            --read-only \
+            -v /proc:/host/proc:ro \
+            -v /sys:/host/sys:ro \
+            -v /:/rootfs:ro \
+            -v metrics:/metrics:ro \
+            "${node_exporter_docker}" --path.procfs /host/proc --path.sysfs /host/sys --collector.textfile.directory /metrics --collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc($|/))"
+        ExecStop=/usr/bin/docker stop node-exporter
+        ExecStopPost=/usr/bin/docker rm node-exporter
+        ExecStopPost=/sbin/iptables -D INPUT -m tcp -p tcp --dport 9100 -j ACCEPT
 
   - path: /etc/systemd/system/bitcoin.service
     permissions: 0644
@@ -321,3 +348,5 @@ runcmd:
   - systemctl enable charge.service
   - systemctl start nginx.service
   - systemctl enable nginx.service
+  - systemctl enable node-exporter.service
+  - systemctl start node-exporter.service

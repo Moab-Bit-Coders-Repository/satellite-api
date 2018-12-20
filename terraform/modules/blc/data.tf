@@ -24,6 +24,7 @@ data "template_file" "blc" {
     redis_port            = 6379
     ionosphere_docker     = "${var.ionosphere_docker}"
     ionosphere_sse_docker = "${var.ionosphere_sse_docker}"
+    node_exporter_docker  = "${var.node_exporter_docker}"
   }
 }
 
