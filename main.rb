@@ -74,6 +74,11 @@ get '/order/:uuid/sent_message' do
   send_file order.message_path, :disposition => 'attachment'
 end
 
+get '/message/:tx_seq_num' do
+  (order = Order.find_by(tx_seq_num: params[:tx_seq_num], status: [:sent, :transmitting])) || halt(404, {:message => "Not found", :errors => ["Sent order with that tx sequence number not found"]}.to_json)
+  send_file order.message_path, :disposition => 'attachment'
+end
+
 # POST /order
 #  
 # upload a message, along with a bid (in millisatoshis)
