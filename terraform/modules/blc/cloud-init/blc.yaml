@@ -33,9 +33,19 @@ write_files:
 
             # Proxy to main ionosphere API
             location /api/ {
-                add_header 'Access-Control-Allow-Headers' null always;
                 add_header 'Access-Control-Allow-Origin' null always;
+                add_header 'Access-Control-Allow-Headers' null always;
                 add_header 'X-XSS-Protection' '1; mode=block' always;
+
+                if ($request_method = 'OPTIONS')
+                {
+                  add_header 'Access-Control-Allow-Origin' '*';
+                  add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE';
+                  add_header 'Access-Control-Allow-Headers' 'X-Auth-Token,DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+                  add_header 'X-XSS-Protection' '1; mode=block' always;
+
+                  return 200;
+                }
 
                 if ($http_origin ~ '(preview.)?blockstream.com')
                 {
