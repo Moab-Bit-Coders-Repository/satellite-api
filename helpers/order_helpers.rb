@@ -13,8 +13,8 @@ module Sinatra
       end
     end
     
-    def order
-      @order ||= authorize_order!(fetch_order_by_uuid)
+    def get_and_authenticate_order
+      authorize_order!(fetch_order_by_uuid)
     end
 
   end

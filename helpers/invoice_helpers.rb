@@ -15,8 +15,8 @@ module Sinatra
       end
     end
     
-    def invoice
-      @invoice ||= authorize_invoice!(fetch_invoice_by_lid)
+    def get_and_authenticate_invoice
+      authorize_invoice!(fetch_invoice_by_lid)
     end
     
     def new_invoice(order, bid)

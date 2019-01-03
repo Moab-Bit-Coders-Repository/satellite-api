@@ -137,6 +137,7 @@ post '/order/:uuid/bump' do
         message: "auth_token must be provided either in the DELETE body or in an X-Auth-Token header"
   bid = Integer(params[:bid])
   
+  order = get_and_authenticate_order
   unless order.bump
     halt 400, {:message => "Cannot bump order", :errors => ["Order already #{order.status}"]}.to_json
   end
@@ -160,7 +161,7 @@ get '/order/:uuid' do
   param :uuid, String, required: true
   param :auth_token, String, required: true, default: lambda { env['HTTP_X_AUTH_TOKEN'] },
         message: "auth_token must be provided either in the DELETE body or in an X-Auth-Token header"
-  order.as_sanitized_json
+  get_and_authenticate_order.as_sanitized_json
 end
 
 delete '/order/:uuid' do
@@ -168,6 +169,7 @@ delete '/order/:uuid' do
   param :auth_token, String, required: true, default: lambda { env['HTTP_X_AUTH_TOKEN'] },
         message: "auth_token must be provided either in the DELETE body or in an X-Auth-Token header"
 
+  order = get_and_authenticate_order
   unless order.cancel!
     halt 400, {:message => "Cannot cancel order", :errors => ["Order already #{order.status}"]}.to_json
   end
@@ -180,7 +182,8 @@ post '/callback/:lid/:charged_auth_token' do
   param :lid, String, required: true
   param :charged_auth_token, String, required: true
 
-  unless invoice
+  invoice = get_and_authenticate_invoice
+  if invoice.nil?
     halt 404, {:message => "Payment problem", :errors => ["Invoice not found"]}.to_json
   end
 
