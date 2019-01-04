@@ -7,22 +7,24 @@ require_relative '../helpers/digest_helpers'
 
 class Order < ActiveRecord::Base
   include AASM
-  before_validation :set_bid_per_byte
   
-  PUBLIC_FIELDS = [:uuid, :bid, :bid_per_byte, :message_size, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at, :tx_seq_num]
+  PUBLIC_FIELDS = [:uuid, :unpaid_bid, :bid, :bid_per_byte, :message_size, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at, :tx_seq_num]
 
   @@redis = Redis.new(url: REDIS_URI)
   
-
   enum status: [:pending, :paid, :transmitting, :sent, :cancelled]
-  validates :bid, presence: true, numericality: { only_integer: true }
-  validates :message_size, presence: true, numericality: { only_integer: true }
+  
+  before_validation :adjust_bids
+  
+  validates :bid, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :unpaid_bid, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :message_size, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: MIN_MESSAGE_SIZE }
   validates :message_digest, presence: true
-  validates :bid_per_byte, presence: true, numericality: { greater_than_or_equal_to: MIN_PER_BYTE_BID }
+  validates :bid_per_byte, numericality: { greater_than_or_equal_to: 0 }
   validates :status, presence: true
   validates :uuid, presence: true
 
-  has_many :invoices
+  has_many :invoices, after_add: :adjust_bids_and_save, after_remove: :adjust_bids_and_save
   
   aasm :column => :status, :enum => true, :whiny_transitions => false, :no_direct_assignment => true do
     state :pending, initial: true
@@ -33,6 +35,7 @@ class Order < ActiveRecord::Base
     
     event :pay do
       transitions :from => :pending, :to => :paid
+      transitions :from => :paid, :to => :paid
     end
 
     event :transmit, :after => :notify_transmissions_channel do
@@ -50,6 +53,25 @@ class Order < ActiveRecord::Base
     event :bump do
       transitions :from => [:pending, :paid], :to => :pending
     end
+  end
+  
+  def adjust_bids_and_save(invoice)
+    self.adjust_bids
+    self.save
+  end
+  
+  def adjust_bids
+    self.bid = paid_invoices_total
+    self.bid_per_byte = (self.bid.to_f / self.message_size.to_f).round(2)
+    self.unpaid_bid = unpaid_invoices_total
+  end
+  
+  def paid_invoices_total
+    self.invoices.where(status: :paid).pluck(:amount).reduce(:+) || 0
+  end
+
+  def unpaid_invoices_total
+    self.invoices.where(status: :pending).pluck(:amount).reduce(:+) || 0
   end
   
   def notify_transmissions_channel
@@ -70,18 +92,6 @@ class Order < ActiveRecord::Base
     hash_hmac('sha256', USER_AUTH_KEY, self.uuid)
   end
 
-  def bid_per_byte
-    super || self.computed_bid_per_byte
-  end
-
-  def computed_bid_per_byte
-    (self.bid.nil? or self.message_size.nil?) ? nil : (self.bid.to_f / self.message_size.to_f).round(2)
-  end
-
-  def set_bid_per_byte
-    self.bid_per_byte = self.computed_bid_per_byte
-  end
-  
   def as_sanitized_json
     self.to_json(:only => Order::PUBLIC_FIELDS)
   end

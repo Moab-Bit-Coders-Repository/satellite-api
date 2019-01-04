@@ -20,19 +20,20 @@ module Sinatra
     end
     
     def new_invoice(order, bid)
+      bid = Integer(bid)
       # generate Lightning invoice
       charged_response = $lightning_charge.post '/invoice', {
-        msatoshi: Integer(bid),
+        msatoshi: bid,
         description: LN_INVOICE_DESCRIPTION,
         expiry: LN_INVOICE_EXPIRY, 
-        metadata: {uuid: order.uuid, msatoshis_per_byte: order.bid, sha256_message_digest: order.message_digest}
+        metadata: {uuid: order.uuid, sha256_message_digest: order.message_digest}
       }  
       unless charged_response.status == 201
         halt 400, {:message => "Lightning Charge invoice creation error", :errors => ["received #{response.status} from charged"]}.to_json
       end
 
       lightning_invoice = JSON.parse(charged_response.body)
-      invoice = Invoice.new(order: order, lid: lightning_invoice["id"], invoice: charged_response.body)
+      invoice = Invoice.new(order: order, amount: bid, lid: lightning_invoice["id"], invoice: charged_response.body)
 
       # register the webhook
       webhook_registration_response = $lightning_charge.post "/invoice/#{invoice.lid}/webhook", {

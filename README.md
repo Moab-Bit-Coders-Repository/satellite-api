@@ -45,15 +45,15 @@ curl -F "bid=10000" -F "file=@/path/to/upload/file/hello_world.png" $IONOSPHERE/
 If successful, the response includes the JSON Lightning invoice as returned by Lightning Charge's [POST /invoice](https://github.com/ElementsProject/lightning-charge#post-invoice) and an authentication token that can be used to modify the order. Within the metadata of the Lightning invoice, metadata is included providing: the bid (in millisatoshis), the SHA256 digest of the uploaded message file, and a UUID for the order.
 
 ```bash
-{"auth_token":"d784e322dad7ec2671086ce3ad94e05108f2501180d8228577fbec4115774750","uuid":"409348bc-6af0-4999-b715-4136753979df","lightning_invoice":{"id":"N0LOTYc9j0gWtQVjVW7pK","msatoshi":"514200","description":"BSS Test","rhash":"5e5c9d111bc76ce4bf9b211f12ca2d9b66b81ae9839b4e530b16cedbef653a3a","payreq":"lntb5142n1pd78922pp5tewf6ygmcakwf0umyy039j3dndntsxhfswd5u5ctzm8dhmm98gaqdqdgff4xgz5v4ehgxqzjccqp286gfgrcpvzl04sdg2f9sany7ptc5aracnd6kvr2nr0e0x5ajpmfhsjkqzw679ytqgnt6w4490jjrgcvuemz790salqyz9far68cpqtgq3q23el","expires_at":1541642146,"created_at":1541641546,"metadata":{"msatoshis_per_byte":"200","sha256_message_digest":"0e2bddf3bba1893b5eef660295ef12d6fc72870da539c328cf24e9e6dbb00f00","uuid":"409348bc-6af0-4999-b715-4136753979df"},"status":"unpaid"}}
+{"auth_token":"d784e322dad7ec2671086ce3ad94e05108f2501180d8228577fbec4115774750","uuid":"409348bc-6af0-4999-b715-4136753979df","lightning_invoice":{"id":"N0LOTYc9j0gWtQVjVW7pK","msatoshi":"514200","description":"BSS Test","rhash":"5e5c9d111bc76ce4bf9b211f12ca2d9b66b81ae9839b4e530b16cedbef653a3a","payreq":"lntb5142n1pd78922pp5tewf6ygmcakwf0umyy039j3dndntsxhfswd5u5ctzm8dhmm98gaqdqdgff4xgz5v4ehgxqzjccqp286gfgrcpvzl04sdg2f9sany7ptc5aracnd6kvr2nr0e0x5ajpmfhsjkqzw679ytqgnt6w4490jjrgcvuemz790salqyz9far68cpqtgq3q23el","expires_at":1541642146,"created_at":1541641546,"metadata":{"sha256_message_digest":"0e2bddf3bba1893b5eef660295ef12d6fc72870da539c328cf24e9e6dbb00f00","uuid":"409348bc-6af0-4999-b715-4136753979df"},"status":"unpaid"}}
 ```
 
 ### POST /order/:uuid/bump ###
 
-Increase the bid for an order sitting in the transmission queue. The new `bid` must be provided in the body of the POST and must be greater than the current bid. An `auth_token` must also be provided. For example, to bump up the bid on the order placed above to 700,000 millisatoshis, issue a POST like this:
+Increase the bid for an order sitting in the transmission queue. The `bid_increase` must be provided in the body of the POST. A Lightning invoice is returned for it and, when it is paid, the increase is added to the current bid. An `auth_token` must also be provided. For example, to increase the bid on the order placed above by 100,000 millisatoshis, issue a POST like this:
 
 ```bash
-curl -v -F "bid=700000" -F "auth_token=d784e322dad7ec2671086ce3ad94e05108f2501180d8228577fbec4115774750" $IONOSPHERE/order/409348bc-6af0-4999-b715-4136753979df/bump
+curl -v -F "bid_increase=100000" -F "auth_token=d784e322dad7ec2671086ce3ad94e05108f2501180d8228577fbec4115774750" $IONOSPHERE/order/409348bc-6af0-4999-b715-4136753979df/bump
 ```
 
 Response object is in the same format as for `POST /order`.

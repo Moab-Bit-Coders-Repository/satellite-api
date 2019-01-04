@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_20_065353) do
+ActiveRecord::Schema.define(version: 2019_01_04_061217) do
 
   create_table "invoices", force: :cascade do |t|
     t.string "lid"
@@ -18,8 +18,11 @@ ActiveRecord::Schema.define(version: 2018_12_20_065353) do
     t.datetime "paid_at"
     t.datetime "created_at"
     t.integer "order_id"
+    t.integer "status"
+    t.integer "amount"
     t.index ["lid"], name: "index_invoices_on_lid", unique: true
     t.index ["order_id"], name: "index_invoices_on_order_id"
+    t.index ["status"], name: "index_invoices_on_status"
   end
 
   create_table "orders", force: :cascade do |t|
@@ -34,6 +37,7 @@ ActiveRecord::Schema.define(version: 2018_12_20_065353) do
     t.datetime "upload_started_at"
     t.datetime "upload_ended_at"
     t.integer "tx_seq_num"
+    t.integer "unpaid_bid"
     t.index ["bid_per_byte"], name: "index_orders_on_bid_per_byte"
     t.index ["tx_seq_num"], name: "index_orders_on_tx_seq_num", unique: true
     t.index ["uuid"], name: "index_orders_on_uuid", unique: true

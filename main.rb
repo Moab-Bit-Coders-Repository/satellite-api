@@ -84,7 +84,7 @@ end
 # upload a message, along with a bid (in millisatoshis)
 # return JSON object with status, uuid, and lightning payment invoice
 post '/order' do
-  param :bid, Integer, required: true
+  param :bid, Integer, required: true, min: 0, message: "must be a positive integer number of msatoshis"
   param :file, Hash, required: true
   bid = Integer(params[:bid])
 
@@ -96,7 +96,7 @@ post '/order' do
     halt 400, {:message => "Message upload problem", :errors => ["Filename missing"]}.to_json
   end
 
-  order = Order.new(:bid => bid, :uuid => SecureRandom.uuid)
+  order = Order.new(uuid: SecureRandom.uuid)
   message_file = File.new(order.message_path, "wb")
   message_size = 0
   sha256 = OpenSSL::Digest::SHA256.new
@@ -116,13 +116,13 @@ post '/order' do
 
   order.message_size = message_size
   order.message_digest = sha256.to_s
-  if order.bid_per_byte < MIN_PER_BYTE_BID
+  if bid.to_f / message_size.to_f < MIN_PER_BYTE_BID
     halt 413, {:message => "Bid too low", :errors => ["Per byte bid cannot be below #{MIN_PER_BYTE_BID} millisatoshis per byte. The minimum bid for this message is #{order.message_size * MIN_PER_BYTE_BID} millisatoshis." ]}.to_json
   end
 
   invoice = new_invoice(order, bid)
   Order.transaction do
-    order.save
+    order.save! # FIXME
     invoice.order = order
     invoice.save
   end
@@ -132,22 +132,17 @@ end
 
 post '/order/:uuid/bump' do
   param :uuid, String, required: true
-  param :bid, Integer, required: true
+  param :bid_increase, Integer, required: true, min: 0, message: "must be a positive integer number of msatoshis"
   param :auth_token, String, required: true, default: lambda { env['HTTP_X_AUTH_TOKEN'] },
         message: "auth_token must be provided either in the DELETE body or in an X-Auth-Token header"
-  bid = Integer(params[:bid])
+  bid_increase = Integer(params[:bid_increase])
   
   order = get_and_authenticate_order
   unless order.bump
     halt 400, {:message => "Cannot bump order", :errors => ["Order already #{order.status}"]}.to_json
   end
   
-  unless bid > order.bid
-    halt 400, {:message => "Cannot bump order", :errors => ["New bid (#{bid}) must be larger than current bid (#{order.bid})"]}.to_json
-  end
-  
-  invoice = new_invoice(order, bid - order.bid)
-  order.bid = bid
+  invoice = new_invoice(order, bid_increase)
 
   Order.transaction do
     order.save
@@ -195,10 +190,7 @@ post '/callback/:lid/:charged_auth_token' do
     halt 400, {:message => "Payment problem", :errors => ["Order already #{invoice.order.status}"]}.to_json
   end
   
-  Order.transaction do
-    invoice.update(:paid_at => Time.now)
-    invoice.order.pay! if invoice.order.invoices_all_paid?    
-  end
+  invoice.pay!
   
   {:message => "invoice #{invoice.lid} paid"}.to_json
 end

@@ -118,8 +118,9 @@ class MainAppTest < Minitest::Test
     pay_invoice(@order.invoices.last)
     assert order_is_queued(@order.uuid)
     header 'X-Auth-Token', @order.user_auth_token
-    post "/order/#{@order.uuid}/bump", params={"bid" => DEFAULT_BID + 1}
+    post "/order/#{@order.uuid}/bump", params={"bid_increase" => 1}
     assert last_response.ok?
+    write_response
     r = JSON.parse(last_response.body)
     refute_nil r['auth_token']
     refute_nil r['uuid']
@@ -127,12 +128,12 @@ class MainAppTest < Minitest::Test
     lid = r['lightning_invoice']['id']
     refute order_is_queued(@order.uuid)
     pay_invoice(Invoice.find_by_lid(lid))
-    assert order_is_queued(@order.uuid)    
+    assert order_is_queued(@order.uuid)
   end
 
   def test_that_bumping_down_fails
     header 'X-Auth-Token', @order.user_auth_token
-    post "/order/#{@order.uuid}/bump", params={"bid" => DEFAULT_BID - 1}
+    post "/order/#{@order.uuid}/bump", params={"bid_increase" => - 1}
     refute last_response.ok?
   end
 
