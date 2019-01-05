@@ -26,11 +26,11 @@ class MainAppTest < Minitest::Test
   def place_order
     post '/order', params={"bid" => DEFAULT_BID, "file" => Rack::Test::UploadedFile.new(TEST_FILE, "image/png")}
     r = JSON.parse(last_response.body)
-    @order = Order.find_by_uuid(r['uuid'])
+    Order.find_by_uuid(r['uuid'])
   end
  
   def setup
-    place_order
+    @order = place_order
   end
   
   def pay_invoice(invoice)
@@ -55,7 +55,7 @@ class MainAppTest < Minitest::Test
     assert last_response.ok?
     r = JSON.parse(last_response.body)
     queued_before = r.count
-    place_order
+    @order = place_order
     pay_invoice(@order.invoices.last)
     assert order_is_queued(@order.uuid)
     get "/orders/queued?limit=#{MAX_QUEUED_ORDERS_REQUEST}"
@@ -113,9 +113,10 @@ class MainAppTest < Minitest::Test
   end
   
   def test_bump
-    place_order
+    @order = place_order
     refute order_is_queued(@order.uuid)
     pay_invoice(@order.invoices.last)
+    puts "@order status is #{@order.status}"
     assert order_is_queued(@order.uuid)
     header 'X-Auth-Token', @order.user_auth_token
     post "/order/#{@order.uuid}/bump", params={"bid_increase" => 1}
@@ -149,7 +150,7 @@ class MainAppTest < Minitest::Test
   end
   
   def test_get_sent_message
-    place_order
+    @order = place_order
     get "/order/#{@order.uuid}/sent_message"
     refute last_response.ok?
 
