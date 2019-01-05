@@ -29,6 +29,13 @@ class MainAppTest < Minitest::Test
     Order.find_by_uuid(r['uuid'])
   end
  
+  def bump_order(order, amount)
+    header 'X-Auth-Token', order.user_auth_token
+    post "/order/#{order.uuid}/bump", params={"bid_increase" => amount}
+    r = JSON.parse(last_response.body)
+    Order.find_by_uuid(r['uuid'])
+  end
+ 
   def setup
     @order = place_order
   end
@@ -116,10 +123,8 @@ class MainAppTest < Minitest::Test
     @order = place_order
     refute order_is_queued(@order.uuid)
     pay_invoice(@order.invoices.last)
-    puts "@order status is #{@order.status}"
     assert order_is_queued(@order.uuid)
-    header 'X-Auth-Token', @order.user_auth_token
-    post "/order/#{@order.uuid}/bump", params={"bid_increase" => 1}
+    bump_order(@order, 1)
     assert last_response.ok?
     write_response
     r = JSON.parse(last_response.body)
@@ -133,8 +138,7 @@ class MainAppTest < Minitest::Test
   end
 
   def test_that_bumping_down_fails
-    header 'X-Auth-Token', @order.user_auth_token
-    post "/order/#{@order.uuid}/bump", params={"bid_increase" => - 1}
+    bump_order(@order, -1)
     refute last_response.ok?
   end
 
