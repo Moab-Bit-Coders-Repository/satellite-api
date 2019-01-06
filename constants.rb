@@ -2,6 +2,7 @@ ENV['RACK_ENV'] ||= 'development'
 KILO_BYTE = 2 ** 10
 MEGA_BYTE = 2 ** 20
 ONE_HOUR = 60 * 60
+ONE_DAY = 24 * ONE_HOUR
 
 require 'yaml'
 yaml_path = File.join(File.expand_path(File.dirname(__FILE__)), 'config', 'database.yml')
@@ -21,6 +22,8 @@ MAX_MESSAGE_SIZE = 1 * MEGA_BYTE
 LN_INVOICE_EXPIRY = ONE_HOUR
 LN_INVOICE_DESCRIPTION = (ENV['RACK_ENV'] == 'production') ? "Blockstream Satellite Transmission" : "BSS Test"
 MAX_LIGHTNING_INVOICE_SIZE = 1024
+
+EXPIRE_PENDING_ORDERS_AFTER = ONE_DAY
 
 TRANSMIT_RATE_LIMIT = Integer(ENV['TRANSMIT_RATE_LIMIT'] || KILO_BYTE) # bytes per second
 PAGE_SIZE = 20
