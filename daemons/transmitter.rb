@@ -16,18 +16,25 @@ end
 # NB: no mutex is needed around max_tx_seq_num because it is assumed that there is only one transmitter
 max_tx_seq_num = Order.maximum(:tx_seq_num) || 0
 
+CLEANUP_DUTY_CYCLE = 5 * 60 # five minutes
+last_cleanup_at = Time.now - CLEANUP_DUTY_CYCLE
+
 # loop forever dequing the highest-priced paid order and piping it to the GNU radio FIFO
 loop do
   sendable_order = nil
   while sendable_order.nil? do
-    # expire any unpaid invoices that have reached their expiration time (orders may be auto-expired as a result)
-    Invoice.where(status: :pending).where("expired_at < ?", Time.now).each { |i| i.expire! }
+    if Time.now > last_cleanup_at + CLEANUP_DUTY_CYCLE
+      # expire any unpaid invoices that have reached their expiration time (orders may be auto-expired as a result)
+      Invoice.where(status: :pending).where("expired_at < ?", Time.now).each { |i| i.expire! }
 
-    # expire old pending orders
-    Order.where(status: :pending).where("created_at < ?", Time.now - EXPIRE_PENDING_ORDERS_AFTER).each { |o| o.expire! }
+      # expire old pending orders
+      Order.where(status: :pending).where("created_at < ?", Time.now - EXPIRE_PENDING_ORDERS_AFTER).each { |o| o.expire! }
     
-    # delete message files for messages sent long ago
-    Order.where(status: :sent).where("ended_transmission_at < ?", Time.now - MESSAGE_FILE_RETENTION_TIME).each { |o| o.delete_message_file }
+      # delete message files for messages sent long ago
+      Order.where(status: :sent).where("ended_transmission_at < ?", Time.now - MESSAGE_FILE_RETENTION_TIME).each { |o| o.delete_message_file }
+      
+      last_cleanup_at = Time.now
+    end
     
     sleep 1
     
