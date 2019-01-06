@@ -15,7 +15,7 @@ class Invoice < ActiveRecord::Base
   
   aasm :column => :status, :enum => true, :whiny_transitions => false, :no_direct_assignment => true do
     state :pending, initial: true
-    state :paid, before_enter: Proc.new { self.paid_at = Time.now }, after_enter: Proc.new { self.order.pay! }
+    state :paid, before_enter: Proc.new { self.paid_at = Time.now }, after_enter: Proc.new { self.order.maybe_mark_as_paid }
 
     event :pay do
       transitions :from => :pending, :to => :paid

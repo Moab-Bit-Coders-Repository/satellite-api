@@ -14,7 +14,7 @@ unless File.exists?(TEST_FILE) and File.exists?(TINY_TEST_FILE)
   `echo "abcdefghijklmnopqrstuvwxyz" > #{TINY_TEST_FILE}`
 end
 
-DEFAULT_BID = File.stat(TEST_FILE).size * MIN_PER_BYTE_BID + 1
+DEFAULT_BID = File.stat(TEST_FILE).size * (MIN_PER_BYTE_BID + 1)
 
 class MainAppTest < Minitest::Test
   include Rack::Test::Methods 
@@ -33,7 +33,7 @@ class MainAppTest < Minitest::Test
     header 'X-Auth-Token', order.user_auth_token
     post "/order/#{order.uuid}/bump", params={"bid_increase" => amount}
     r = JSON.parse(last_response.body)
-    Order.find_by_uuid(r['uuid'])
+    r['lightning_invoice']
   end
  
   def setup
@@ -135,6 +135,21 @@ class MainAppTest < Minitest::Test
     refute order_is_queued(@order.uuid)
     pay_invoice(Invoice.find_by_lid(lid))
     assert order_is_queued(@order.uuid)
+  end
+
+  def test_paying_small_invoices_doesnt_result_in_paid_order
+    place_order
+    refute @order.paid?
+    first_invoice = @order.invoices.first
+    bump_order(@order, 123)
+    refute @order.paid?
+    second_invoice = @order.invoices.where(amount: 123).first
+    pay_invoice(second_invoice)
+    @order.reload
+    refute @order.paid?
+    pay_invoice(first_invoice)
+    @order.reload
+    assert @order.paid?
   end
 
   def test_that_bumping_down_fails

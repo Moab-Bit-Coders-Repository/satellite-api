@@ -34,7 +34,7 @@ class Order < ActiveRecord::Base
     state :cancelled, before_enter: Proc.new { self.cancelled_at = Time.now }
     
     event :pay do
-      transitions :from => :pending, :to => :paid
+      transitions :from => :pending, :to => :paid, :guard => :paid_enough?
       transitions :from => :paid, :to => :paid
     end
 
@@ -64,6 +64,15 @@ class Order < ActiveRecord::Base
     self.bid = paid_invoices_total
     self.bid_per_byte = (self.bid.to_f / self.message_size.to_f).round(2)
     self.unpaid_bid = unpaid_invoices_total
+  end
+  
+  def maybe_mark_as_paid
+    self.pay! if self.paid_enough?
+  end
+  
+  def paid_enough?
+    self.adjust_bids
+    self.bid_per_byte >= MIN_PER_BYTE_BID
   end
   
   def paid_invoices_total
