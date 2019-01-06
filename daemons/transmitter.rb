@@ -20,8 +20,12 @@ max_tx_seq_num = Order.maximum(:tx_seq_num) || 0
 loop do
   sendable_order = nil
   while sendable_order.nil? do
+    # expire any unpaid invoices that have reached their expiration time (orders may be auto-expired as a result)
+    Invoice.where(status: :pending).where("expired_at < ?", Time.now).each { |i| i.expire! }
+    
     sleep 1
     
+    # look for an elligble order to transmit and, if one is found, begin transmitting it
     Order.transaction do
       sendable_order = Order.where(status: :paid).order(bid_per_byte: :desc).first
       if sendable_order

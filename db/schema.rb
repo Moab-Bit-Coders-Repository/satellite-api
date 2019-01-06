@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_04_061217) do
+ActiveRecord::Schema.define(version: 2019_01_06_203037) do
 
   create_table "invoices", force: :cascade do |t|
     t.string "lid"
@@ -20,6 +20,8 @@ ActiveRecord::Schema.define(version: 2019_01_04_061217) do
     t.integer "order_id"
     t.integer "status"
     t.integer "amount"
+    t.datetime "expires_at"
+    t.index ["expires_at"], name: "index_invoices_on_expires_at"
     t.index ["lid"], name: "index_invoices_on_lid", unique: true
     t.index ["order_id"], name: "index_invoices_on_order_id"
     t.index ["status"], name: "index_invoices_on_status"

@@ -29,6 +29,7 @@ class Order < ActiveRecord::Base
   aasm :column => :status, :enum => true, :whiny_transitions => false, :no_direct_assignment => true do
     state :pending, initial: true
     state :paid
+    state :expired
     state :transmitting, before_enter: Proc.new { self.upload_started_at = Time.now }
     state :sent, before_enter: Proc.new { self.upload_ended_at = Time.now }
     state :cancelled, before_enter: Proc.new { self.cancelled_at = Time.now }
@@ -52,6 +53,10 @@ class Order < ActiveRecord::Base
     
     event :bump do
       transitions :from => [:pending, :paid], :to => :pending
+    end
+    
+    event :expire, :after => :delete_message_file do
+      transitions :from => :pending, :to => :expired
     end
   end
   
@@ -80,7 +85,15 @@ class Order < ActiveRecord::Base
   end
 
   def unpaid_invoices_total
-    self.invoices.where(status: :pending).pluck(:amount).reduce(:+) || 0
+    self.pending_invoices.pluck(:amount).reduce(:+) || 0
+  end
+  
+  def pending_invoices
+    self.invoices.where(status: :pending)
+  end
+  
+  def expire_if_pending_and_no_pending_invoices
+    self.expire! if self.pending? and pending_invoices.count = 0
   end
   
   def notify_transmissions_channel
