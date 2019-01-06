@@ -3,6 +3,7 @@ KILO_BYTE = 2 ** 10
 MEGA_BYTE = 2 ** 20
 ONE_HOUR = 60 * 60
 ONE_DAY = 24 * ONE_HOUR
+ONE_MONTH = 31 * ONE_DAY
 
 require 'yaml'
 yaml_path = File.join(File.expand_path(File.dirname(__FILE__)), 'config', 'database.yml')
@@ -24,6 +25,7 @@ LN_INVOICE_DESCRIPTION = (ENV['RACK_ENV'] == 'production') ? "Blockstream Satell
 MAX_LIGHTNING_INVOICE_SIZE = 1024
 
 EXPIRE_PENDING_ORDERS_AFTER = ONE_DAY
+MESSAGE_FILE_RETENTION_TIME = ONE_MONTH
 
 TRANSMIT_RATE_LIMIT = Integer(ENV['TRANSMIT_RATE_LIMIT'] || KILO_BYTE) # bytes per second
 PAGE_SIZE = 20

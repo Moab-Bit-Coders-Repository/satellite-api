@@ -26,6 +26,9 @@ loop do
     # expire old pending orders
     Order.where(status: :pending).where("created_at < ?", Time.now - EXPIRE_PENDING_ORDERS_AFTER).each { |o| o.expire! }
     
+    # delete message files for messages sent long ago
+    Order.where(status: :sent).where("ended_transmission_at < ?", Time.now - MESSAGE_FILE_RETENTION_TIME).each { |o| o.delete_message_file }
+    
     sleep 1
     
     # look for an elligble order to transmit and, if one is found, begin transmitting it
