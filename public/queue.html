@@ -58,10 +58,10 @@
                     <th class="created_at">Created</th>
                     <th class="bid_per_byte">Bid per Byte (millisatoshis)</th>
                     <th class="message_size">Message Size</th>
+                    <th class="unpaid_bid">Unpaid Bid</th>
                     <th class="uuid">Order ID</th>
                     <th class="status">Status</th>
-                    <th class="started_transmission_at">Upload Started</th>
-                    <th class="ended_transmission_at">Upload Ended</th>
+                    <th class="started_transmission_at">Transmission Started</th>
                 </tr>
             </thead>
         </table>
@@ -75,10 +75,9 @@
                     <th class="created_at">Created</th>
                     <th class="bid_per_byte">Bid per Byte (millisatoshis)</th>
                     <th class="message_size">Message Size</th>
+                    <th class="unpaid_bid">Unpaid Bid</th>
                     <th class="uuid">Order ID</th>
                     <th class="status">Status</th>
-                    <th class="started_transmission_at">Upload Started</th>
-                    <th class="ended_transmission_at">Upload Ended</th>
                 </tr>
             </thead>
         </table>
@@ -93,9 +92,11 @@
                     <th class="bid_per_byte">Bid per Byte (millisatoshis)</th>
                     <th class="message">Message</th>
                     <th class="message_size">Message Size</th>
+                    <th class="unpaid_bid">Unpaid Bid</th>
                     <th class="uuid">Order ID</th>
                     <th class="status">Status</th>
-                    <th class="started_transmission_at">Upload Started</th>
+                    <th class="started_transmission_at">Transmission Started</th>
+                    <th class="ended_transmission_at">Transmission Ended</th>
                 </tr>
             </thead>
         </table>
@@ -113,10 +114,10 @@
                 $('<td>').text(moment(val.created_at).fromNow()),
                 $('<td>').text(val.bid_per_byte),
                 $('<td>').text(val.message_size),
+                $('<td>').text(val.unpaid_bid),
                 $('<td>').text(val.uuid),
                 $('<td>').text(val.status),
-                $('<td>').text(started_transmission_at.isValid() ? started_transmission_at.fromNow() : ""),
-                $('<td>').text(ended_transmission_at.isValid() ? ended_transmission_at.fromNow() : "")
+                $('<td>').text(started_transmission_at.isValid() ? started_transmission_at.fromNow() : "")
           ));
         });
       });
@@ -129,10 +130,9 @@
                 $('<td>').text(moment(val.created_at).fromNow()),
                 $('<td>').text(val.bid_per_byte),
                 $('<td>').text(val.message_size),
+                $('<td>').text(val.unpaid_bid),
                 $('<td>').text(val.uuid),
-                $('<td>').text(val.status),
-                $('<td>').text(started_transmission_at.isValid() ? started_transmission_at.fromNow() : ""),
-                $('<td>').text(ended_transmission_at.isValid() ? ended_transmission_at.fromNow() : "")
+                $('<td>').text(val.status)
           ));
         });
       });
@@ -146,6 +146,7 @@
                 $('<td>').text(val.bid_per_byte),
                 $('<td>').html('<a href="order/' + val.uuid + '/sent_message">download</a>'),
                 $('<td>').text(val.message_size),
+                $('<td>').text(val.unpaid_bid),
                 $('<td>').text(val.uuid),
                 $('<td>').text(val.status),
                 $('<td>').text(started_transmission_at.isValid() ? started_transmission_at.fromNow() : ""),
