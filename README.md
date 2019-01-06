@@ -102,7 +102,7 @@ curl $IONOSPHERE/orders/queued
 curl $IONOSPHERE/orders/queued?limit=18
 ```
 
-The response is a JSON array of records (one for each queued message). The revealed fields for each record include: `uuid`, `bid`, `bid_per_byte`, `message_size`, `message_digest`, `status`, `created_at`, `upload_started_at`, and `upload_ended_at`.
+The response is a JSON array of records (one for each queued message). The revealed fields for each record include: `uuid`, `bid`, `bid_per_byte`, `message_size`, `message_digest`, `status`, `created_at`, `started_transmission_at`, and `ended_transmission_at`.
 
 ### GET /orders/sent  ###
 
@@ -116,7 +116,7 @@ curl $IONOSPHERE/orders/sent
 curl $IONOSPHERE/orders/sent?limit=18
 ```
 
-The response is a JSON array of records (one for each queued message). The revealed fields for each record include: `uuid`, `bid`, `bid_per_byte`, `message_size`, `message_digest`, `status`, `created_at`, `upload_started_at`, and `upload_ended_at`.
+The response is a JSON array of records (one for each queued message). The revealed fields for each record include: `uuid`, `bid`, `bid_per_byte`, `message_size`, `message_digest`, `status`, `created_at`, `started_transmission_at`, and `ended_transmission_at`.
 
 ## Debugging ##
 

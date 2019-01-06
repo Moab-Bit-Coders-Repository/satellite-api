@@ -8,7 +8,7 @@ require_relative '../helpers/digest_helpers'
 class Order < ActiveRecord::Base
   include AASM
   
-  PUBLIC_FIELDS = [:uuid, :unpaid_bid, :bid, :bid_per_byte, :message_size, :message_digest, :status, :created_at, :upload_started_at, :upload_ended_at, :tx_seq_num]
+  PUBLIC_FIELDS = [:uuid, :unpaid_bid, :bid, :bid_per_byte, :message_size, :message_digest, :status, :created_at, :started_transmission_at, :ended_transmission_at, :tx_seq_num]
 
   @@redis = Redis.new(url: REDIS_URI)
   
@@ -30,8 +30,8 @@ class Order < ActiveRecord::Base
     state :pending, initial: true
     state :paid
     state :expired
-    state :transmitting, before_enter: Proc.new { self.upload_started_at = Time.now }
-    state :sent, before_enter: Proc.new { self.upload_ended_at = Time.now }
+    state :transmitting, before_enter: Proc.new { self.started_transmission_at = Time.now }
+    state :sent, before_enter: Proc.new { self.ended_transmission_at = Time.now }
     state :cancelled, before_enter: Proc.new { self.cancelled_at = Time.now }
     
     event :pay do

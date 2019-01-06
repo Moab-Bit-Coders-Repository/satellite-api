@@ -51,7 +51,7 @@ get '/orders/sent' do
   before = DateTime.iso8601(params[:before])
   Order.where(status: :sent).where("created_at < ?", before)
        .select(Order::PUBLIC_FIELDS)
-       .order(upload_ended_at: :desc)
+       .order(ended_transmission_at: :desc)
        .limit(PAGE_SIZE).to_json(:only => Order::PUBLIC_FIELDS)
 end
 

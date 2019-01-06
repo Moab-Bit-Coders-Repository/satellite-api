@@ -60,8 +60,8 @@
                     <th class="message_size">Message Size</th>
                     <th class="uuid">Order ID</th>
                     <th class="status">Status</th>
-                    <th class="upload_started_at">Upload Started</th>
-                    <th class="upload_ended_at">Upload Ended</th>
+                    <th class="started_transmission_at">Upload Started</th>
+                    <th class="ended_transmission_at">Upload Ended</th>
                 </tr>
             </thead>
         </table>
@@ -77,8 +77,8 @@
                     <th class="message_size">Message Size</th>
                     <th class="uuid">Order ID</th>
                     <th class="status">Status</th>
-                    <th class="upload_started_at">Upload Started</th>
-                    <th class="upload_ended_at">Upload Ended</th>
+                    <th class="started_transmission_at">Upload Started</th>
+                    <th class="ended_transmission_at">Upload Ended</th>
                 </tr>
             </thead>
         </table>
@@ -95,7 +95,7 @@
                     <th class="message_size">Message Size</th>
                     <th class="uuid">Order ID</th>
                     <th class="status">Status</th>
-                    <th class="upload_started_at">Upload Started</th>
+                    <th class="started_transmission_at">Upload Started</th>
                 </tr>
             </thead>
         </table>
@@ -107,40 +107,40 @@
     $(function() {
       $.getJSON( "orders/queued", function( data ) {
         $.each( data, function( key, val ) {
-          var upload_started_at = moment(val.upload_started_at);
-          var upload_ended_at = moment(val.upload_ended_at);
+          var started_transmission_at = moment(val.started_transmission_at);
+          var ended_transmission_at = moment(val.ended_transmission_at);
           $("#queued_table").append($('<tr>').append(
                 $('<td>').text(moment(val.created_at).fromNow()),
                 $('<td>').text(val.bid_per_byte),
                 $('<td>').text(val.message_size),
                 $('<td>').text(val.uuid),
                 $('<td>').text(val.status),
-                $('<td>').text(upload_started_at.isValid() ? upload_started_at.fromNow() : ""),
-                $('<td>').text(upload_ended_at.isValid() ? upload_ended_at.fromNow() : "")
+                $('<td>').text(started_transmission_at.isValid() ? started_transmission_at.fromNow() : ""),
+                $('<td>').text(ended_transmission_at.isValid() ? ended_transmission_at.fromNow() : "")
           ));
         });
       });
 
       $.getJSON( "orders/pending", function( data ) {
         $.each( data, function( key, val ) {
-          var upload_started_at = moment(val.upload_started_at);
-          var upload_ended_at = moment(val.upload_ended_at);
+          var started_transmission_at = moment(val.started_transmission_at);
+          var ended_transmission_at = moment(val.ended_transmission_at);
           $("#pending_table").append($('<tr>').append(
                 $('<td>').text(moment(val.created_at).fromNow()),
                 $('<td>').text(val.bid_per_byte),
                 $('<td>').text(val.message_size),
                 $('<td>').text(val.uuid),
                 $('<td>').text(val.status),
-                $('<td>').text(upload_started_at.isValid() ? upload_started_at.fromNow() : ""),
-                $('<td>').text(upload_ended_at.isValid() ? upload_ended_at.fromNow() : "")
+                $('<td>').text(started_transmission_at.isValid() ? started_transmission_at.fromNow() : ""),
+                $('<td>').text(ended_transmission_at.isValid() ? ended_transmission_at.fromNow() : "")
           ));
         });
       });
 
       $.getJSON( "orders/sent", function( data ) {
         $.each( data, function( key, val ) {
-          var upload_started_at = moment(val.upload_started_at);
-          var upload_ended_at = moment(val.upload_ended_at);
+          var started_transmission_at = moment(val.started_transmission_at);
+          var ended_transmission_at = moment(val.ended_transmission_at);
           $("#sent_table").append($('<tr>').append(
                 $('<td>').text(moment(val.created_at).fromNow()),
                 $('<td>').text(val.bid_per_byte),
@@ -148,8 +148,8 @@
                 $('<td>').text(val.message_size),
                 $('<td>').text(val.uuid),
                 $('<td>').text(val.status),
-                $('<td>').text(upload_started_at.isValid() ? upload_started_at.fromNow() : ""),
-                $('<td>').text(upload_ended_at.isValid() ? upload_ended_at.fromNow() : "")
+                $('<td>').text(started_transmission_at.isValid() ? started_transmission_at.fromNow() : ""),
+                $('<td>').text(ended_transmission_at.isValid() ? ended_transmission_at.fromNow() : "")
           ));
         });
       });
