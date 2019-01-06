@@ -158,9 +158,12 @@ class MainAppTest < Minitest::Test
   end
 
   def test_order_deletion
+    @order = place_order
+    assert File.file?(@order.message_path)
     header 'X-Auth-Token', @order.user_auth_token
     cancelled_before = Order.where(status: :cancelled).count
     delete "/order/#{@order.uuid}"
+    refute File.file?(@order.message_path)
     cancelled_after = Order.where(status: :cancelled).count
     assert last_response.ok?
     assert_equal cancelled_after, cancelled_before + 1

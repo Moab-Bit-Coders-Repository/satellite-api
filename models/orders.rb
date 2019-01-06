@@ -46,7 +46,7 @@ class Order < ActiveRecord::Base
       transitions :from => :transmitting, :to => :sent
     end
 
-    event :cancel do
+    event :cancel, :after => :delete_message_file do
       transitions :from => [:pending, :paid], :to => :cancelled
     end
     
@@ -103,6 +103,10 @@ class Order < ActiveRecord::Base
 
   def as_sanitized_json
     self.to_json(:only => Order::PUBLIC_FIELDS)
+  end
+
+  def delete_message_file
+    File.delete(self.message_path)
   end
 
 end
