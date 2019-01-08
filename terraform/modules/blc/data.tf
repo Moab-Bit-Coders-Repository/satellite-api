@@ -25,6 +25,7 @@ data "template_file" "blc" {
     ionosphere_docker     = "${var.ionosphere_docker}"
     ionosphere_sse_docker = "${var.ionosphere_sse_docker}"
     node_exporter_docker  = "${var.node_exporter_docker}"
+    opsgenie_key          = "${var.opsgenie_key}"
   }
 }
 

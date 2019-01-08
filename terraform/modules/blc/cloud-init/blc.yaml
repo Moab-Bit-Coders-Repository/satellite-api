@@ -70,6 +70,33 @@ write_files:
             }
         }
 
+  - path: /home/bs/check_containers.sh
+    permissions: 0744
+    owner: root
+    content: |
+        #!/bin/bash
+
+        # Save # and names of running containers
+        NUM_CONT=$$(docker ps -q | wc -l)
+        RUNNING_CONT="$$(docker ps --format '{{.Names}}' | tr '\n' ', ' | sed -e 's/,$//g')"
+
+        # If less than 10 are running, send alert to opsgenie
+        if [ $${NUM_CONT} != '10' ]
+        then
+               curl -X POST https://api.opsgenie.com/v2/alerts \
+                  -H "Content-Type: application/json" \
+                  -H "Authorization: GenieKey ${opsgenie_key}" \
+                  -d \
+              '{
+                  "message": "Satellite API instance does not have all containers running",
+                  "alias": "satapi-missing-containers",
+                  "description":"Currently running: '$${RUNNING_CONT}'",
+                  "tags": ["SatAPI","Critical"],
+                  "entity":"satellite.blockstream.com/api",
+                  "priority":"P3"
+              }'
+        fi
+
   - path: /home/bs/bitcoin.conf
     permissions: 0644
     owner: root
@@ -90,6 +117,32 @@ write_files:
         bitcoin-rpcport=${rpcport}
         announce-addr=${announce_addr}
         bind-addr=0.0.0.0
+
+  - path: /etc/systemd/system/check-containers.service
+    permissions: 0644
+    owner: root
+    content: |
+        [Unit]
+        Description=Check # of containers
+
+        [Service]
+        Type=oneshot
+        ExecStart=/bin/bash /home/bs/check_containers.sh
+
+  - path: /etc/systemd/system/check-containers.timer
+    permissions: 0644
+    owner: root
+    content: |
+        [Unit]
+        Description=Run check_containers.sh every 10 minutes (7 min delay)
+
+        [Timer]
+        OnBootSec=420s
+        OnUnitActiveSec=10m
+        Persistent=true
+
+        [Install]
+        WantedBy=timers.target
 
   - path: /etc/systemd/system/nginx.service
     permissions: 0644
@@ -339,6 +392,8 @@ write_files:
 
 runcmd:
   - systemctl daemon-reload
+  - systemctl start check-containers.service
+  - systemctl enable check-containers.service
   - systemctl start bitcoin.service
   - systemctl enable bitcoin.service
   - systemctl start lightning.service

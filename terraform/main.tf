@@ -50,4 +50,5 @@ module "blc" {
   ssl_cert          = "${var.ssl_cert}"
   timeout           = "${var.timeout}"
   prom_service_acct = "${data.terraform_remote_state.lightning-store-prod.prometheus_service_account}"
+  opsgenie_key      = "${var.opsgenie_key}"
 }

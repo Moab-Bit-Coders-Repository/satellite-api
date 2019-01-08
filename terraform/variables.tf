@@ -38,6 +38,10 @@ variable "prom_service_acct" {
   default = ""
 }
 
+variable "opsgenie_key" {
+  type = "string"
+}
+
 # Overwritten by CI
 variable "ionosphere_docker" {
   type    = "string"

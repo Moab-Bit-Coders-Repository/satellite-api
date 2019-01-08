@@ -44,6 +44,10 @@ variable "timeout" {
   type = "string"
 }
 
+variable "opsgenie_key" {
+  type = "string"
+}
+
 variable "prom_service_acct" {
   type = "string"
 }
