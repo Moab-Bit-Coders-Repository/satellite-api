@@ -17,7 +17,7 @@ class Order < ActiveRecord::Base
   before_validation :adjust_bids
   
   validates :bid, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-  validates :unpaid_bid, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :unpaid_bid, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :message_size, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: MIN_MESSAGE_SIZE }
   validates :message_digest, presence: true
   validates :bid_per_byte, numericality: { greater_than_or_equal_to: 0 }
@@ -52,7 +52,8 @@ class Order < ActiveRecord::Base
     end
     
     event :bump do
-      transitions :from => [:pending, :paid], :to => :pending
+      transitions :from => :pending, :to => :pending
+      transitions :from => :paid, :to => :paid
     end
     
     event :expire, :after => :delete_message_file do

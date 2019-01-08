@@ -121,11 +121,8 @@ post '/order' do
   end
 
   invoice = new_invoice(order, bid)
-  Order.transaction do
-    order.save! # FIXME
-    invoice.order = order
-    invoice.save
-  end
+  order.invoices << invoice
+  order.save
   
   {:auth_token => order.user_auth_token, :uuid => order.uuid, :lightning_invoice => JSON.parse(invoice.invoice)}.to_json
 end
@@ -143,11 +140,8 @@ post '/order/:uuid/bump' do
   end
   
   invoice = new_invoice(order, bid_increase)
-
-  Order.transaction do
-    order.save
-    invoice.save
-  end
+  order.invoices << invoice
+  order.save
   
   {:auth_token => order.user_auth_token, :uuid => order.uuid, :lightning_invoice => JSON.parse(invoice.invoice)}.to_json
 end
@@ -186,8 +180,8 @@ post '/callback/:lid/:charged_auth_token' do
     halt 404, {:message => "Payment problem", :errors => ["Orphaned invoice"]}.to_json
   end
 
-  unless invoice.order.status == 'pending'
-    halt 400, {:message => "Payment problem", :errors => ["Order already #{invoice.order.status}"]}.to_json
+  if invoice.paid?
+    halt 400, {:message => "Payment problem", :errors => ["Order already paid"]}.to_json
   end
   
   invoice.pay!

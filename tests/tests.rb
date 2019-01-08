@@ -23,8 +23,8 @@ class MainAppTest < Minitest::Test
     Sinatra::Application
   end
  
-  def place_order
-    post '/order', params={"bid" => DEFAULT_BID, "file" => Rack::Test::UploadedFile.new(TEST_FILE, "image/png")}
+  def place_order(bid = DEFAULT_BID)
+    post '/order', params={"bid" => bid, "file" => Rack::Test::UploadedFile.new(TEST_FILE, "image/png")}
     r = JSON.parse(last_response.body)
     Order.find_by_uuid(r['uuid'])
   end
@@ -50,7 +50,7 @@ class MainAppTest < Minitest::Test
   end
   
   def order_is_queued(uuid)
-    get '/orders/queued'
+    get "/orders/queued?limit=#{MAX_QUEUED_ORDERS_REQUEST}"
     assert last_response.ok?
     r = JSON.parse(last_response.body)
     uuids = r.map {|o| o['uuid']}
@@ -120,21 +120,48 @@ class MainAppTest < Minitest::Test
   end
   
   def test_bump
+    # place an order
     @order = place_order
     refute order_is_queued(@order.uuid)
-    pay_invoice(@order.invoices.last)
+    @order.reload
+    assert_equal 0, @order.bid
+    assert_equal DEFAULT_BID, @order.unpaid_bid
+
+    first_invoice = @order.invoices.first
+    pay_invoice(first_invoice)
     assert order_is_queued(@order.uuid)
-    bump_order(@order, 1)
+    @order.reload
+    assert_equal DEFAULT_BID, @order.bid
+    assert @order.bid_per_byte > 0
+    assert_equal 0, @order.unpaid_bid
+    bid_pre = @order.bid
+    bid_per_byte_pre = @order.bid_per_byte
+    unpaid_bid_pre = @order.unpaid_bid
+
+    # bump it
+    bump_order(@order, DEFAULT_BID / 2)
     assert last_response.ok?
-    write_response
+    @order.reload
+    assert_equal bid_pre, @order.bid
+    assert_equal bid_per_byte_pre, @order.bid_per_byte
+    assert_equal DEFAULT_BID / 2, @order.unpaid_bid
+    bid_pre = @order.bid
+    bid_per_byte_pre = @order.bid_per_byte
+
     r = JSON.parse(last_response.body)
     refute_nil r['auth_token']
     refute_nil r['uuid']
     refute_nil r['lightning_invoice']
     lid = r['lightning_invoice']['id']
-    refute order_is_queued(@order.uuid)
-    pay_invoice(Invoice.find_by_lid(lid))
     assert order_is_queued(@order.uuid)
+
+    # pay the bump
+    second_invoice = Invoice.find_by_lid(lid)
+    pay_invoice(second_invoice)
+    @order.reload
+    assert_equal DEFAULT_BID + DEFAULT_BID / 2, @order.bid
+    assert @order.bid_per_byte > bid_per_byte_pre
+    assert_equal 0, @order.unpaid_bid
   end
 
   def test_paying_small_invoices_doesnt_result_in_paid_order
