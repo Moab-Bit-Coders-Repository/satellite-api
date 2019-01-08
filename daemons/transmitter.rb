@@ -25,7 +25,7 @@ loop do
   while sendable_order.nil? do
     if Time.now > last_cleanup_at + CLEANUP_DUTY_CYCLE
       # expire any unpaid invoices that have reached their expiration time (orders may be auto-expired as a result)
-      Invoice.where(status: :pending).where("expired_at < ?", Time.now).each { |i| i.expire! }
+      Invoice.where(status: :pending).where("expires_at < ?", Time.now).each { |i| i.expire! }
 
       # expire old pending orders
       Order.where(status: :pending).where("created_at < ?", Time.now - EXPIRE_PENDING_ORDERS_AFTER).each { |o| o.expire! }
