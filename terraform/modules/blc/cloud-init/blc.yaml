@@ -9,6 +9,27 @@ users:
     uid: 2000
 
 write_files:
+  - path: /home/bs/bitcoin.conf
+    permissions: 0644
+    owner: root
+    content: |
+        rpcuser=${rpcuser}
+        rpcpassword=${rpcpass}
+        rpcport=${rpcport}
+        txindex=1
+        dbcache=4000
+
+  - path: /home/bs/lightning.conf
+    permissions: 0644
+    owner: root
+    content: |
+        alias=ionosphere
+        bitcoin-rpcuser=${rpcuser}
+        bitcoin-rpcpassword=${rpcpass}
+        bitcoin-rpcport=${rpcport}
+        announce-addr=${announce_addr}
+        bind-addr=0.0.0.0
+
   - path: /home/bs/default.conf
     permissions: 0644
     owner: root
@@ -83,50 +104,32 @@ write_files:
         # If less than 10 are running, send alert to opsgenie
         if [ $${NUM_CONT} != '10' ]
         then
-               curl -X POST https://api.opsgenie.com/v2/alerts \
+               curl -s -X POST https://api.opsgenie.com/v2/alerts \
                   -H "Content-Type: application/json" \
                   -H "Authorization: GenieKey ${opsgenie_key}" \
                   -d \
               '{
-                  "message": "Satellite API instance does not have all containers running",
+                  "message": "Satellite API instance does not have all 10 containers running",
                   "alias": "satapi-missing-containers",
-                  "description":"Currently running: '$${RUNNING_CONT}'",
+                  "description":"Currently running '$${NUM_CONT}'/10: '$${RUNNING_CONT}'",
                   "tags": ["SatAPI","Critical"],
                   "entity":"satellite.blockstream.com/api",
                   "priority":"P3"
               }'
+          else
+                echo "'$${NUM_CONT}'/10 containers are running"
         fi
-
-  - path: /home/bs/bitcoin.conf
-    permissions: 0644
-    owner: root
-    content: |
-        rpcuser=${rpcuser}
-        rpcpassword=${rpcpass}
-        rpcport=${rpcport}
-        txindex=1
-        dbcache=4000
-
-  - path: /home/bs/lightning.conf
-    permissions: 0644
-    owner: root
-    content: |
-        alias=ionosphere
-        bitcoin-rpcuser=${rpcuser}
-        bitcoin-rpcpassword=${rpcpass}
-        bitcoin-rpcport=${rpcport}
-        announce-addr=${announce_addr}
-        bind-addr=0.0.0.0
 
   - path: /etc/systemd/system/check-containers.service
     permissions: 0644
     owner: root
     content: |
         [Unit]
-        Description=Check # of containers
+        Description=Check # of containers every 10 mins
+        Wants=check-containers.timer
+        After=charge.service
 
         [Service]
-        Type=oneshot
         ExecStart=/bin/bash /home/bs/check_containers.sh
 
   - path: /etc/systemd/system/check-containers.timer
@@ -134,7 +137,7 @@ write_files:
     owner: root
     content: |
         [Unit]
-        Description=Run check_containers.sh every 10 minutes (7 min delay)
+        Description=Run check-containers service every 10 minutes (7 min delay)
 
         [Timer]
         OnBootSec=420s
