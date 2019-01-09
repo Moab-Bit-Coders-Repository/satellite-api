@@ -395,8 +395,6 @@ write_files:
 
 runcmd:
   - systemctl daemon-reload
-  - systemctl start check-containers.service
-  - systemctl enable check-containers.service
   - systemctl start bitcoin.service
   - systemctl enable bitcoin.service
   - systemctl start lightning.service
@@ -415,3 +413,5 @@ runcmd:
   - systemctl enable nginx.service
   - systemctl enable node-exporter.service
   - systemctl start node-exporter.service
+  - systemctl start check-containers.timer
+  - systemctl enable check-containers.timer
